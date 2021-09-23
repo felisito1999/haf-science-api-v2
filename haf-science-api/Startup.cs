@@ -1,5 +1,6 @@
 using haf_science_api.Interfaces;
 using haf_science_api.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,11 +10,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using haf_science_api.Services;
+using AutoMapper;
 
 namespace haf_science_api
 {
@@ -29,17 +36,53 @@ namespace haf_science_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+            //Database services
             var connection = Configuration.GetConnectionString("HafScienceDatabase");
+            
             services.AddDbContextPool<HafScienceDbContext>(
                 options => options.UseSqlServer(connection));
 
-            services.AddControllers();
+            //Authentication services
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
+            });
+
+            //Password services 
+            services.AddScoped<IPasswordService, PasswordService>();
+
+            //Controllers and data services
+            services.Configure<Options.PasswordOptions>(Configuration.GetSection("PasswordOptions"));
+            services.AddScoped<IDataService<Estado>, EstadosService>();
+            services.AddScoped<IUserService<UsuarioModel>, UsuariosService>();
+            //services.AddScoped<ILogger,>
+            //services.AddScoped<UsuariosService, UsuariosService>();
+
+            //Mapper configuration
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+
+            services.AddSingleton(mapper);
+
+            //Swagger configuration
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "haf_science_api", Version = "v1" });
             });
-
-            services.AddScoped<IDataService<Estado>, EstadoService>
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +98,8 @@ namespace haf_science_api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

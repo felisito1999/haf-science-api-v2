@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace haf_science_api.Services
 {
-    public class EstadoService : IDataService<Estado>
+    public class EstadosService : IDataService<Estado>
     {
         private readonly HafScienceDbContext _dbContext;
 
-        public EstadoService(HafScienceDbContext dbContext)
+        public EstadosService(HafScienceDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -26,7 +26,9 @@ namespace haf_science_api.Services
         {
             using (_dbContext)
             {
-                var estados = await _dbContext.Estados.ToListAsync();
+                //var estados = await _dbContext.Estados.ToListAsync();
+                var estados = await _dbContext.Estados
+                    .FromSqlRaw("EXECUTE spGetEstados").ToListAsync();
                 return estados;
             }
         }

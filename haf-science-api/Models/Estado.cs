@@ -9,7 +9,6 @@ namespace haf_science_api.Models
     {
         public Estado()
         {
-            Roles = new HashSet<Role>();
             Usuarios = new HashSet<Usuario>();
         }
 
@@ -20,7 +19,6 @@ namespace haf_science_api.Models
         public bool Eliminado { get; set; }
 
         public virtual TiposEstado TipoEstado { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
         public virtual ICollection<Usuario> Usuarios { get; set; }
     }
 }

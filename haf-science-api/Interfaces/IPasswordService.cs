@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 namespace haf_science_api.Interfaces
 {
-    public interface IPasswordHasher
+    public interface IPasswordService
     {
         string HashPassword(string password, byte[] salt);
-        byte[] GetSalta();
+        byte[] GetSalt();
         string ConvertSaltToString(byte[] salt);
+        byte[] ConvertStringSaltToByteA(string saltString);
+        string CreateDefaultUserPassword(string FirstNameLetters, string LastNameLetters, DateTime Birthdate);
     }
 }

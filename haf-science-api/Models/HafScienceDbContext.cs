@@ -8,6 +8,7 @@ namespace haf_science_api.Models
 {
     public partial class HafScienceDbContext : DbContext
     {
+
         public HafScienceDbContext(DbContextOptions<HafScienceDbContext> options)
             : base(options)
         {
@@ -88,18 +89,10 @@ namespace haf_science_api.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.EstadoId).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.Nombre)
                     .IsRequired()
                     .HasMaxLength(25)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Estado)
-                    .WithMany(p => p.Roles)
-                    .HasForeignKey(d => d.EstadoId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Estados_Roles");
             });
 
             modelBuilder.Entity<TipoActividad>(entity =>
@@ -122,7 +115,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE02C3A424C")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE0A935EB0E")
                     .IsUnique();
 
                 entity.Property(e => e.Contrasena)
@@ -141,12 +134,6 @@ namespace haf_science_api.Models
                 entity.Property(e => e.Salt)
                     .IsRequired()
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.CentroEducativo)
-                    .WithMany(p => p.Usuarios)
-                    .HasForeignKey(d => d.CentroEducativoId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_CentrosEducativos_Usuarios");
 
                 entity.HasOne(d => d.Estado)
                     .WithMany(p => p.Usuarios)
@@ -169,7 +156,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F381EB4A15")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F364AEC5CD")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -191,6 +178,12 @@ namespace haf_science_api.Models
                 entity.Property(e => e.Telefono)
                     .HasMaxLength(13)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.CentroEducativo)
+                    .WithMany(p => p.UsuariosDetalles)
+                    .HasForeignKey(d => d.CentroEducativoId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CentrosEducativos_Usuarios");
             });
 
             OnModelCreatingPartial(modelBuilder);

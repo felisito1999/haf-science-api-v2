@@ -9,7 +9,7 @@ namespace haf_science_api.Models
     {
         public CentrosEducativo()
         {
-            Usuarios = new HashSet<Usuario>();
+            UsuariosDetalles = new HashSet<UsuariosDetalle>();
         }
 
         public int Id { get; set; }
@@ -18,6 +18,6 @@ namespace haf_science_api.Models
         public int EstadoId { get; set; }
         public bool Eliminado { get; set; }
 
-        public virtual ICollection<Usuario> Usuarios { get; set; }
+        public virtual ICollection<UsuariosDetalle> UsuariosDetalles { get; set; }
     }
 }
