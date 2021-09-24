@@ -20,11 +20,12 @@ namespace haf_science_api.Controllers
         {
             _estadosService = estadosService;
         }
+        [Route("get")]
         [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Estado>>> Get()
         {
-            var estados = await _estadosService.GetData();
+            var estados = await _estadosService.GetAll();
 
             return Ok(estados);
         }

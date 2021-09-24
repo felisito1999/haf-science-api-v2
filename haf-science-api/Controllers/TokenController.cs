@@ -11,8 +11,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using haf_science_api.Viewmodels;
 using haf_science_api.Interfaces;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace haf_science_api.Controllers
 {
@@ -21,58 +22,24 @@ namespace haf_science_api.Controllers
     public class TokenController : ControllerBase
     {
         public IConfiguration _configuration;
-        private readonly IUserService<UsuarioModel> _usersService; 
+        private readonly IUserService<UsuarioModel> _usersService;
+        private readonly ITokenService _tokenService;
+        private readonly IMapper _mapper;
  
-        public TokenController(IConfiguration configuration, IUserService<UsuarioModel> usersService)
+        public TokenController(IConfiguration configuration, IUserService<UsuarioModel> usersService, ITokenService tokenService,
+            IMapper mapper)
         {
             _configuration = configuration;
             _usersService = usersService;
+            _tokenService = tokenService;
+            _mapper = mapper;
         }
-        [HttpPost]  
-        public async Task<IActionResult> Post([FromBody]UserInfo _user)
+
+        [Route("logout")]
+        [Authorize]
+        public async Task<ActionResult> Logout()
         {
-            if(_user != null && _user.NombreUsuario != null && _user.Contrasena != null)
-            {
-                var user = await GetUserLoginInfo(_user.NombreUsuario, _user.Contrasena);
-
-                if (user != null)                
-                {
-                    var claims = new[]
-                    {
-                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                        new Claim("id", user.Id.ToString()),
-                        new Claim("firstName", user.Nombres),
-                        new Claim("lastName", user.Apellidos),
-                        new Claim("userName", user.NombreUsuario),
-                        new Claim("email", user.CorreoElectronico),
-                        new Claim("role", user.Rol)
-                    };
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                    var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(7), signingCredentials: signIn);
-
-                    return Ok(new JwtSecurityTokenHandler().WriteToken(token));
-                }
-                else
-                {
-                    return BadRequest("Credenciales invalidas");
-                }
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
-        public async Task<UsuarioModel> GetUserLoginInfo(string username, string password)
-        {
-            var user = await _usersService.GetUsuarioLoginInfo(username, password);
-
-            return user;
+            return Ok();
         }
     }
 }

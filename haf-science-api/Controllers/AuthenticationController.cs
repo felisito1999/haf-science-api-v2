@@ -10,23 +10,33 @@ using System.Threading.Tasks;
 
 namespace haf_science_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUserService<UsuarioModel> _usuariosService;
+        private readonly IUserService<UsuarioModel> _usersService;
         private readonly IMapper _mapper;
-        public AuthenticationController(IUserService<UsuarioModel> usuariosService, IMapper mapper)
+        private readonly ITokenService _tokenService;
+        public AuthenticationController(IUserService<UsuarioModel> usersService, IMapper mapper, ITokenService tokenService)
         {
-            _usuariosService = usuariosService;
+            _usersService = usersService;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
-        //[Route("api/auth/register")]
-        [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegistrationModel model)
+        [Route("check")]
+        public async Task<ActionResult> CheckUserIsLoggedIn()
         {
-            var userExists = await _usuariosService.GetUsuarioByUsername(model.NombreUsuario);
+            var isUserLoggedIn = this.User.Identity.IsAuthenticated;
+
+            return Ok(isUserLoggedIn);
+        }
+        [HttpPost]
+        [Route("register")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult> Register([FromBody] RegistrationModel model)
+        {
+            var userExists = await _usersService.GetUsuarioByUsername(model.NombreUsuario);
 
             if (userExists != null)
             {
@@ -37,9 +47,51 @@ namespace haf_science_api.Controllers
             var claimsIdentity = this.User.Identity as ClaimsIdentity;
             model.CreadoPor = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
-            await _usuariosService.Register(_mapper.Map<UsuarioModel>(model));
+            await _usersService.Register(_mapper.Map<UsuarioModel>(model));
 
-            return Ok();
+            return StatusCode(StatusCodes.Status200OK,
+                new Response { Status = "Success", Message = "Se ha registrado el usuario exitosamente" });
+        }
+        [HttpPost]
+        [Route("token")]
+        public async Task<IActionResult> GetToken([FromBody] UsuarioModel requestUser)
+        {
+            if (requestUser != null && requestUser.NombreUsuario != null && requestUser.Contrasena != null)
+            {
+                var user = await _usersService.GetUsuarioLoginInfo(requestUser.NombreUsuario, requestUser.Contrasena);
+
+                if (user != null)
+                {
+                    var token = _tokenService.WriteToken(user);
+                    return Ok(
+                        new TokenResponse
+                        {
+                            Status = "Success",
+                            Token = token,
+                            UserInfo = _mapper.Map<UserInfo>(user)
+                        });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized,
+                        new Response { Status = "Unauthorized", Message = "No se pudo iniciar sesión, revise el usuario y la contraseña ingresados." });
+                }
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        new Response { Status = "Error", Message = "Credenciales inválidas" });
+            }
+        }
+        [Route("info")]
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> UserInfo()
+        {
+            int loggedUserId = Convert.ToInt32((this.User.Identity as ClaimsIdentity).FindFirst("id").Value);
+            var user = _mapper.Map<UserInfo>(await _usersService.GetUsuarioById(loggedUserId));
+
+            return Ok(user);
         }
     }
 }

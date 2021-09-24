@@ -1,5 +1,4 @@
 ﻿using haf_science_api.Models;
-using haf_science_api.Viewmodels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace haf_science_api.Interfaces
     {
         public Task<T> GetUsuarioLoginInfo(string username, string password);
         public Task<T> GetUsuarioByUsername(string username);
-        public Task<T> GetDataById(int id);
+        public Task<T> GetUsuarioById(int id);
         public Task Register(T user);
         public Task Update(T dataObject);
         public Task Delete(int id);

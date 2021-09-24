@@ -16,8 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using haf_science_api.Services;
 using AutoMapper;
@@ -65,6 +63,7 @@ namespace haf_science_api
             services.Configure<Options.PasswordOptions>(Configuration.GetSection("PasswordOptions"));
             services.AddScoped<IDataService<Estado>, EstadosService>();
             services.AddScoped<IUserService<UsuarioModel>, UsuariosService>();
+            services.AddScoped<ITokenService, TokenService>();
             //services.AddScoped<ILogger,>
             //services.AddScoped<UsuariosService, UsuariosService>();
 
@@ -88,6 +87,13 @@ namespace haf_science_api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(
+                options =>
+                {
+                    options.WithOrigins("http://localhost:3000");
+                    options.AllowAnyMethod();
+                    options.AllowAnyHeader();
+                });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

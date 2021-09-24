@@ -8,8 +8,8 @@ namespace haf_science_api.Interfaces
     public interface IDataService<T>
         where T : class
     {
-        Task<IEnumerable<T>> GetData();
-        Task<T> GetDataById(int id);
+        Task<IEnumerable<T>> GetAll();
+        Task<T> GetById(int id);
         Task SaveSingle(T dataObject);
         Task SaveMultiple(IEnumerable<T> dataCollection);
         Task Update(T dataObject);

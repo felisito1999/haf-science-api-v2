@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using haf_science_api.Interfaces;
 using haf_science_api.Models;
-using haf_science_api.Viewmodels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -29,23 +28,37 @@ namespace haf_science_api.Services
         {
             try
             {
-                var user = await _dbContext.Usuarios.Where(x => x.NombreUsuario == username && x.Contrasena == password)
-                .Include(x => x.Rol)
-                .SingleOrDefaultAsync();
+                var user = await GetUsuarioByUsername(username);
 
-                var userDetails = await _dbContext.UsuariosDetalles.Where(x => x.Id == user.UsuarioDetalleId).FirstOrDefaultAsync();
-
-                var userInfo = new UsuarioModel
+                if (user != null)
                 {
-                    Id = user.Id,
-                    Nombres = userDetails.Nombres,
-                    Apellidos = userDetails.Apellidos,
-                    NombreUsuario = user.NombreUsuario,
-                    Contrasena = user.Contrasena,
-                    CorreoElectronico = userDetails.CorreoElectronico,
-                    Rol = user.Rol.Nombre
-                };
-                return userInfo;
+                    var byteSalt = _passwordService.ConvertStringSaltToByteA(user.Salt);
+                    var hashedPassword = _passwordService.HashPassword(password, byteSalt);
+
+                    if (user.Contrasena != hashedPassword)
+                    {
+                        user = null;
+                        return user;
+                    }
+                    //user = (await _dbContext.UsuariosModel.FromSqlRaw("EXECUTE spGetUserByUsernamePassword {0}, {1}", username, enteredPassword).ToListAsync()).FirstOrDefault();
+                }
+                //var user = await _dbContext.Usuarios.Where(x => x.NombreUsuario == username && x.Contrasena == password)
+                //.Include(x => x.Rol)
+                //.SingleOrDefaultAsync();
+
+                //var userDetails = await _dbContext.UsuariosDetalles.Where(x => x.Id == user.UsuarioDetalleId).FirstOrDefaultAsync();
+
+                //var userInfo = new UsuarioModel
+                //{
+                //    Id = user.Id,
+                //    Nombres = userDetails.Nombres,
+                //    Apellidos = userDetails.Apellidos,
+                //    NombreUsuario = user.NombreUsuario,
+                //    Contrasena = user.Contrasena,
+                //    CorreoElectronico = userDetails.CorreoElectronico,
+                //    NombreRol = user.Rol.Nombre
+                //};
+                return user;
             }
             catch (Exception ex)
             {
@@ -57,15 +70,9 @@ namespace haf_science_api.Services
         {
             try
             {
-                var usuario = await _dbContext.Usuarios.Where(x => x.NombreUsuario == username).FirstOrDefaultAsync();
+                var usuario = (await _dbContext.UsuariosModel.FromSqlRaw("EXECUTE spGetUserDataByUsername {0}", username).ToListAsync()).FirstOrDefault();
 
-                //var usuario = new UsuarioModel()
-                //{
-                //    Id = usuario.Id,
-
-                //}
-
-                return _mapper.Map<UsuarioModel>(usuario);
+                return usuario;
             }
             catch (Exception ex)
             {
@@ -73,30 +80,11 @@ namespace haf_science_api.Services
                 throw new Exception(ex.ToString());
             }
         }
-        public async Task<UsuarioModel> GetDataById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveMultiple(IEnumerable<UsuarioModel> dataCollection)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveSingle(UsuarioModel dataObject)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task Update(UsuarioModel dataObject)
         {
             throw new NotImplementedException();
         }
         public async Task Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
-        public async Task<IEnumerable<UsuarioModel>> GetData()
         {
             throw new NotImplementedException();
         }
@@ -109,21 +97,6 @@ namespace haf_science_api.Services
                 string stringSalt = _passwordService.ConvertSaltToString(salt);
                 string newPassword = _passwordService.CreateDefaultUserPassword(user.Nombres, user.Apellidos, user.FechaNacimiento);
                 string hashedNewPassword = _passwordService.HashPassword(newPassword, salt);
-
-                //UsuarioModel user = new UsuarioModel()
-                //{
-                //    Nombres = model.Nombres,
-                //    Apellidos = model.Apellidos,
-                //    CentroEducativoId = model.CentroEducativoId,
-                //    FechaNacimiento = model.FechaNacimiento,
-                //    Telefono = model.Telefono,
-                //    CorreoElectronico = model.CorreoElectronico,
-                //    NombreUsuario = model.NombreUsuario,
-                //    Salt = stringSalt,
-                //    Contrasena = hashedNewPassword,
-                //    RolId = model.RolId,
-                //    EstadoId = model.EstadoId
-                //};
 
                 var parameters = new object[]
                 {
@@ -144,7 +117,7 @@ namespace haf_science_api.Services
                 await _dbContext.Database.ExecuteSqlRawAsync("spRegisterUser {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}",
                     parameters);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -153,6 +126,13 @@ namespace haf_science_api.Services
         public Task<IEnumerable<UsuarioModel>> GetUsers()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<UsuarioModel> GetUsuarioById(int id)
+        {
+            var user = (await _dbContext.UsuariosModel.FromSqlRaw("EXECUTE spGetUserDataById {0}", id).ToListAsync()).FirstOrDefault();
+
+            return user;
         }
     }
 }

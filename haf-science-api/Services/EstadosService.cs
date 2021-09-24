@@ -22,18 +22,14 @@ namespace haf_science_api.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Estado>> GetData()
+        public async Task<IEnumerable<Estado>> GetAll()
         {
-            using (_dbContext)
-            {
-                //var estados = await _dbContext.Estados.ToListAsync();
-                var estados = await _dbContext.Estados
-                    .FromSqlRaw("EXECUTE spGetEstados").ToListAsync();
-                return estados;
-            }
+            var estados = await _dbContext.Estados
+                .FromSqlRaw("EXECUTE spGetEstados").ToListAsync();
+            return estados;
         }
 
-        public async Task<Estado> GetDataById(int id)
+        public async Task<Estado> GetById(int id)
         {
             throw new NotImplementedException();
         }

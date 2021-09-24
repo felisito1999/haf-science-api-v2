@@ -15,6 +15,8 @@ namespace haf_science_api
             CreateMap<RegistrationModel, UsuarioModel>();
             CreateMap<UsuarioModel, Usuario>();
             CreateMap<Usuario, UsuarioModel>();
+            CreateMap<UserInfo, UsuarioModel>();
+            CreateMap<UsuarioModel, UserInfo>();
         }
     }
 }

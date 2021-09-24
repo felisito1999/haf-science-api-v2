@@ -22,13 +22,14 @@ namespace haf_science_api.Models
         public virtual DbSet<TiposEstado> TiposEstados { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<UsuariosDetalle> UsuariosDetalles { get; set; }
+        public virtual DbSet<UsuarioModel> UsuariosModel { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=HafScienceDb;Integrated Security=True");
-            }
+            //if (!optionsBuilder.IsConfigured)
+            //{
+            //    optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=HafScienceDb;Integrated Security=True");
+            //}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
