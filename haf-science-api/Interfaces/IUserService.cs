@@ -15,6 +15,8 @@ namespace haf_science_api.Interfaces
         public Task Register(T user);
         public Task Update(T dataObject);
         public Task Delete(int id);
-        public Task<IEnumerable<T>> GetUsers();
+        public Task<IEnumerable<T>> GetUsers(int page, int pageSize);
+        public Task<IEnumerable<T>> GetUsersByPagination(int page, int pageSize, int? centroEducativoId,
+            string username, string name, string correoElectronico);
     }
 }

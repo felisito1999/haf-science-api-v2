@@ -58,14 +58,33 @@ namespace haf_science_api
 
             //Password services 
             services.AddScoped<IPasswordService, PasswordService>();
+            services.Configure<Options.PasswordOptions>(Configuration.GetSection("PasswordOptions"));
 
             //Controllers and data services
-            services.Configure<Options.PasswordOptions>(Configuration.GetSection("PasswordOptions"));
             services.AddScoped<IDataService<Estado>, EstadosService>();
+            services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            services.AddScoped<IDataService<Role>, RolesService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+            //services.AddScoped<IDataService<Estado>, EstadosService>();
+            //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
+
             services.AddScoped<IUserService<UsuarioModel>, UsuariosService>();
+            
             services.AddScoped<ITokenService, TokenService>();
-            //services.AddScoped<ILogger,>
-            //services.AddScoped<UsuariosService, UsuariosService>();
 
             //Mapper configuration
             var mapperConfig = new MapperConfiguration(mc =>

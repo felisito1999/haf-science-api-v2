@@ -40,24 +40,7 @@ namespace haf_science_api.Services
                         user = null;
                         return user;
                     }
-                    //user = (await _dbContext.UsuariosModel.FromSqlRaw("EXECUTE spGetUserByUsernamePassword {0}, {1}", username, enteredPassword).ToListAsync()).FirstOrDefault();
                 }
-                //var user = await _dbContext.Usuarios.Where(x => x.NombreUsuario == username && x.Contrasena == password)
-                //.Include(x => x.Rol)
-                //.SingleOrDefaultAsync();
-
-                //var userDetails = await _dbContext.UsuariosDetalles.Where(x => x.Id == user.UsuarioDetalleId).FirstOrDefaultAsync();
-
-                //var userInfo = new UsuarioModel
-                //{
-                //    Id = user.Id,
-                //    Nombres = userDetails.Nombres,
-                //    Apellidos = userDetails.Apellidos,
-                //    NombreUsuario = user.NombreUsuario,
-                //    Contrasena = user.Contrasena,
-                //    CorreoElectronico = userDetails.CorreoElectronico,
-                //    NombreRol = user.Rol.Nombre
-                //};
                 return user;
             }
             catch (Exception ex)
@@ -123,9 +106,11 @@ namespace haf_science_api.Services
             }
         }
 
-        public Task<IEnumerable<UsuarioModel>> GetUsers()
+        public async Task<IEnumerable<UsuarioModel>> GetUsers()
         {
-            throw new NotImplementedException();
+            var users = await _dbContext.UsuariosModel.FromSqlRaw("g").ToListAsync();
+
+            return users;
         }
 
         public async Task<UsuarioModel> GetUsuarioById(int id)
@@ -133,6 +118,16 @@ namespace haf_science_api.Services
             var user = (await _dbContext.UsuariosModel.FromSqlRaw("EXECUTE spGetUserDataById {0}", id).ToListAsync()).FirstOrDefault();
 
             return user;
+        }
+
+        public Task<IEnumerable<UsuarioModel>> GetUsers(int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<UsuarioModel>> GetUsersByPagination(int page, int pageSize, int? centroEducativoId, string username, string name, string correoElectronico)
+        {
+            throw new NotImplementedException();
         }
     }
 }
