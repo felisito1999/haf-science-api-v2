@@ -35,7 +35,12 @@ namespace haf_science_api.Services
             }
         }
 
-        public Task<Role> GetById(int id)
+        public Task<Role> GetById(int? id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Role>> GetByName(string name)
         {
             throw new NotImplementedException();
         }

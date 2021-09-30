@@ -24,7 +24,7 @@ namespace haf_science_api.Services
 
             return centrosEducativos; 
         }
-        public async Task<CentrosEducativo> GetById(int id)
+        public async Task<CentrosEducativo> GetById(int? id)
         {
             try
             {
@@ -53,6 +53,21 @@ namespace haf_science_api.Services
         public Task Delete(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<CentrosEducativo>> GetByName(string name)
+        {
+            try
+            {
+                var centrosEducativos = await _dbContext.CentrosEducativos.FromSqlRaw("EXECUTE spGetSchoolsByName {0}", name).ToListAsync();
+
+                return centrosEducativos;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }

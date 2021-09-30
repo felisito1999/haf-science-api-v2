@@ -29,7 +29,12 @@ namespace haf_science_api.Services
             return estados;
         }
 
-        public async Task<Estado> GetById(int id)
+        public async Task<Estado> GetById(int? id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Estado>> GetByName(string name)
         {
             throw new NotImplementedException();
         }

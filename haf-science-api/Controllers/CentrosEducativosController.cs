@@ -17,37 +17,29 @@ namespace haf_science_api.Controllers
 
         public CentrosEducativosController(IDataService<CentrosEducativo> centrosEducativosService)
         {
-            _centrosEducativosService = centrosEducativosService; 
+            _centrosEducativosService = centrosEducativosService;
         }
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<ActionResult> Get(int? id, string name)
         {
             try
             {
-                var centrosEducativos = await _centrosEducativosService.GetAll();
-
-                return Ok(centrosEducativos);
+                if (id.HasValue)
+                {
+                    return Ok( await _centrosEducativosService.GetById(id));
+                }
+                else if (!string.IsNullOrWhiteSpace(name))
+                {
+                    return Ok(await _centrosEducativosService.GetByName(name));
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception)
             {
-
-                return BadRequest();
-            }
-        }
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<ActionResult> GetById(int id)
-        {
-            try
-            {
-                var centroEducativo = await _centrosEducativosService.GetById(id);
-
-                return Ok(centroEducativo);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-                throw;
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

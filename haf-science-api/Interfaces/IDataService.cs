@@ -9,7 +9,8 @@ namespace haf_science_api.Interfaces
         where T : class
     {
         Task<IEnumerable<T>> GetAll();
-        Task<T> GetById(int id);
+        Task<T> GetById(int? id);
+        Task<IEnumerable<T>> GetByName(string name);
         Task SaveSingle(T dataObject);
         Task SaveMultiple(IEnumerable<T> dataCollection);
         Task Update(T dataObject);
