@@ -10,7 +10,7 @@ namespace haf_science_api.Interfaces
         string HashPassword(string password, byte[] salt);
         byte[] GetSalt();
         string ConvertSaltToString(byte[] salt);
-        byte[] ConvertStringSaltToByteA(string saltString);
+        byte[] ConvertStringSaltToByteArray(string saltString);
         string CreateDefaultUserPassword(string FirstNameLetters, string LastNameLetters, DateTime Birthdate);
     }
 }

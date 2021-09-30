@@ -24,14 +24,6 @@ namespace haf_science_api.Controllers
             _tokenService = tokenService;
         }
         [HttpPost]
-        [Route("check")]
-        public async Task<ActionResult> CheckUserIsLoggedIn()
-        {
-            var isUserLoggedIn = this.User.Identity.IsAuthenticated;
-
-            return Ok(isUserLoggedIn);
-        }
-        [HttpPost]
         [Route("register")]
         [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Register([FromBody] RegistrationModel model)
@@ -54,7 +46,7 @@ namespace haf_science_api.Controllers
         }
         [HttpPost]
         [Route("token")]
-        public async Task<IActionResult> GetToken([FromBody] UsuarioModel requestUser)
+        public async Task<ActionResult> GetToken([FromBody] LoginData requestUser)
         {
             if (requestUser != null && requestUser.NombreUsuario != null && requestUser.Contrasena != null)
             {
@@ -83,6 +75,13 @@ namespace haf_science_api.Controllers
                         new Response { Status = "Error", Message = "Credenciales inválidas" });
             }
         }
+        [HttpPost]
+        [Route("logout")]
+        [Authorize]
+        public async Task<ActionResult> Logout()
+        {
+            return Ok();
+        }
         [Route("info")]
         [Authorize]
         [HttpGet]
@@ -92,6 +91,14 @@ namespace haf_science_api.Controllers
             var user = _mapper.Map<UserInfo>(await _usersService.GetUsuarioById(loggedUserId));
 
             return Ok(user);
+        }
+        [HttpPost]
+        [Route("check")]
+        public async Task<ActionResult> CheckUserIsLoggedIn()
+        {
+            var isUserLoggedIn = this.User.Identity.IsAuthenticated;
+
+            return Ok(isUserLoggedIn);
         }
     }
 }

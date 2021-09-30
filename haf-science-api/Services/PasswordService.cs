@@ -21,7 +21,7 @@ namespace haf_science_api.Services
         {
             return Convert.ToBase64String(salt);
         }
-        public byte[] ConvertStringSaltToByteA(string saltString)
+        public byte[] ConvertStringSaltToByteArray(string saltString)
         {
             return Convert.FromBase64String(saltString);
         }

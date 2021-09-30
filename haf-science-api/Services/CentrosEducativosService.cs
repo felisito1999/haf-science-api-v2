@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using haf_science_api.Interfaces;
 using haf_science_api.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,25 @@ namespace haf_science_api.Services
             _dbContext = dbContext;
             _mapper = mapper;
         }
-        public Task<IEnumerable<CentrosEducativo>> GetAll()
+        public async Task<IEnumerable<CentrosEducativo>> GetAll()
         {
-            throw new NotImplementedException();
+            var centrosEducativos = await _dbContext.CentrosEducativos.ToListAsync();
+
+            return centrosEducativos; 
         }
-        public Task<CentrosEducativo> GetById(int id)
+        public async Task<CentrosEducativo> GetById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var centroEducativo = await _dbContext.CentrosEducativos.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+                return centroEducativo;
+            }
+            catch (Exception)
+            {
+
+                throw ;
+            }
         }
         public Task SaveSingle(CentrosEducativo dataObject)
         {

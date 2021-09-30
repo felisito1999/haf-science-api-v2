@@ -32,7 +32,7 @@ namespace haf_science_api.Services
 
                 if (user != null)
                 {
-                    var byteSalt = _passwordService.ConvertStringSaltToByteA(user.Salt);
+                    var byteSalt = _passwordService.ConvertStringSaltToByteArray(user.Salt);
                     var hashedPassword = _passwordService.HashPassword(password, byteSalt);
 
                     if (user.Contrasena != hashedPassword)
@@ -120,12 +120,20 @@ namespace haf_science_api.Services
             return user;
         }
 
-        public Task<IEnumerable<UsuarioModel>> GetUsers(int page, int pageSize)
+        public async Task<IEnumerable<UsuarioView>> GetPaginatedUsers(int page, int pageSize)
         {
-            throw new NotImplementedException();
+            var users = await _dbContext.UsuariosView.FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize).ToListAsync();
+
+            return users; 
+        }
+        public async Task<int> GetPaginatedUsersCount()
+        {
+            var count = (await _dbContext.TotalRecordsModel.FromSqlRaw("EXECUTE spGetAllPaginatedUsersDataCount").ToListAsync()).FirstOrDefault();
+
+            return count.RecordsTotal;
         }
 
-        public Task<IEnumerable<UsuarioModel>> GetUsersByPagination(int page, int pageSize, int? centroEducativoId, string username, string name, string correoElectronico)
+        public Task<IEnumerable<UsuarioView>> GetPaginatedUsersBy(int page, int pageSize, int? centroEducativoId, string username, string name, string correoElectronico)
         {
             throw new NotImplementedException();
         }

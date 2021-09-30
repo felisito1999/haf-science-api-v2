@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace haf_science_api.Models
 {
     [Keyless]
-    public class UsuarioModel
+    public class UsuarioView
     {
         public int Id { get; set; }
         public string Nombres { get; set; }
@@ -18,11 +18,11 @@ namespace haf_science_api.Models
         public string Telefono { get; set; }
         public string CorreoElectronico { get; set; }
         public string NombreUsuario { get; set; }
-        public string Salt { get; set; }
-        public string Contrasena { get; set; }
         public int RolId { get; set; }
         public string NombreRol { get; set; }
         public int EstadoId { get; set; }
+        public string NombreEstado { get; set; }
         public int? CreadoPor { get; set; }
+        public string NombreUsuarioCreador { get; set; }
     }
 }

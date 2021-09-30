@@ -23,6 +23,8 @@ namespace haf_science_api.Models
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<UsuariosDetalle> UsuariosDetalles { get; set; }
         public virtual DbSet<UsuarioModel> UsuariosModel { get; set; }
+        public virtual DbSet<UsuarioView> UsuariosView { get; set; }
+        public virtual DbSet<RecordsTotalModel> TotalRecordsModel { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

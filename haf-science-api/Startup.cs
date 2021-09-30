@@ -109,7 +109,7 @@ namespace haf_science_api
             app.UseCors(
                 options =>
                 {
-                    options.WithOrigins("http://localhost:3000");
+                    options.WithOrigins("http://localhost:3000", "http://10.0.0.27");
                     options.AllowAnyMethod();
                     options.AllowAnyHeader();
                 });

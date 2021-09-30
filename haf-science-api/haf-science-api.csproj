@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>haf_science_api</RootNamespace>
     <UserSecretsId>7eb3518f-2c76-4dec-9da6-d0e6727e77f1</UserSecretsId>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

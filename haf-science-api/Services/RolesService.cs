@@ -1,5 +1,6 @@
 ﻿using haf_science_api.Interfaces;
 using haf_science_api.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,29 @@ namespace haf_science_api.Services
 {
     public class RolesService : IDataService<Role>
     {
+        private readonly HafScienceDbContext _dbContext;
+        public RolesService(HafScienceDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
         public Task Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Role>> GetAll()
+        public async Task<IEnumerable<Role>> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var roles = await _dbContext.Roles.ToListAsync();
+
+                return roles;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public Task<Role> GetById(int id)
