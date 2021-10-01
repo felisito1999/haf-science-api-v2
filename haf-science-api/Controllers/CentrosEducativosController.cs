@@ -1,5 +1,6 @@
 ﻿using haf_science_api.Interfaces;
 using haf_science_api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,6 +21,7 @@ namespace haf_science_api.Controllers
             _centrosEducativosService = centrosEducativosService;
         }
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult> Get(int? id, string name)
         {
             try
@@ -34,7 +36,7 @@ namespace haf_science_api.Controllers
                 }
                 else
                 {
-                    return BadRequest();
+                    return Ok(await _centrosEducativosService.GetAll());
                 }
             }
             catch (Exception)

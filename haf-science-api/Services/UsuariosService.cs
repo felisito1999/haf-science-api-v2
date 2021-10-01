@@ -115,27 +115,200 @@ namespace haf_science_api.Services
 
         public async Task<UsuarioModel> GetUsuarioById(int id)
         {
-            var user = (await _dbContext.UsuariosModel.FromSqlRaw("EXECUTE spGetUserDataById {0}", id).ToListAsync()).FirstOrDefault();
+            var user = (await _dbContext.UsuariosModel
+                .FromSqlRaw("EXECUTE spGetUserDataById {0}", id)
+                .ToListAsync())
+                .FirstOrDefault();
 
             return user;
         }
 
         public async Task<IEnumerable<UsuarioView>> GetPaginatedUsers(int page, int pageSize)
         {
-            var users = await _dbContext.UsuariosView.FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize).ToListAsync();
+            var users = await _dbContext.UsuariosView
+                .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
+                .ToListAsync();
 
             return users; 
         }
         public async Task<int> GetPaginatedUsersCount()
         {
-            var count = (await _dbContext.TotalRecordsModel.FromSqlRaw("EXECUTE spGetAllPaginatedUsersDataCount").ToListAsync()).FirstOrDefault();
+            var count = (await _dbContext.TotalRecordsModel
+                .FromSqlRaw("EXECUTE spGetAllPaginatedUsersDataCount")
+                .ToListAsync()).FirstOrDefault();
 
             return count.RecordsTotal;
         }
 
-        public Task<IEnumerable<UsuarioView>> GetPaginatedUsersBy(int page, int pageSize, int? centroEducativoId, string username, string name, string correoElectronico)
+        public async Task<IEnumerable<UsuarioView>> GetPaginatedUsersBy(int page, int pageSize, 
+            int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
         {
-            throw new NotImplementedException();
+            //Por nombre, rol y centro educativo
+            if (!string.IsNullOrWhiteSpace(name) && rolId.HasValue && centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var userByNameRolAndSchool = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUserDataByNameRoleSchool {0}, {1}, {2}, {3}, {4}", page, pageSize, name, rolId, centroEducativoId)
+                    .ToListAsync();
+
+                return userByNameRolAndSchool;
+            }
+            //Por nombre y rol
+            else if (!string.IsNullOrWhiteSpace(name) && rolId.HasValue && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var usersByNameAndRoleId = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByNameRole {0}, {1}, {2}, {3}", page, pageSize, name, rolId)
+                    .ToListAsync();
+
+                return usersByNameAndRoleId;
+            }
+            //Por nombre y centro educativo 
+            else if (!string.IsNullOrWhiteSpace(name) && !rolId.HasValue && centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var usersByNameAndSchools = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByNameSchools {0}, {1}, {2}, {3}", page, pageSize, name, centroEducativoId)
+                    .ToListAsync();
+
+                return usersByNameAndSchools;
+            }
+            //Por centro educativo y rol
+            else if (centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name)
+                && string.IsNullOrWhiteSpace(correoElectronico) && rolId.HasValue)
+            {
+                var usersBySchoolsAndRol = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUserDataBySchoolsRoles {0}, {1}, {2}, {3}", page, pageSize, centroEducativoId, rolId)
+                    .ToListAsync();
+
+                return usersBySchoolsAndRol;
+            }
+            //Por nombre
+            else if (!string.IsNullOrWhiteSpace(name) && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) 
+                && string.IsNullOrWhiteSpace(correoElectronico) && !rolId.HasValue)
+            {
+                var usersByName = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByName {0}, {1}, {2}", page, pageSize, name)
+                    .ToListAsync();
+
+                return usersByName;
+            }
+            //Por centrosEducativos
+            else if (centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name) 
+                && string.IsNullOrWhiteSpace(correoElectronico) && !rolId.HasValue)
+            {
+                var usersByCentroEducativoId = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUserDataBySchools {0}, {1}, {2}", page, pageSize, centroEducativoId)
+                    .ToListAsync();
+
+                return usersByCentroEducativoId;
+            }
+            //Por rol
+            else if (rolId.HasValue && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var usersByRolId = await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedUserDataByRole {0}, {1}, {2}", page, pageSize, rolId)
+                    .ToListAsync();
+
+                return usersByRolId;
+            }
+
+
+            return await _dbContext.UsuariosView
+                    .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
+                    .ToListAsync();
+        }
+
+        public async Task<int> GetPaginatedUsersCountBy(int? centroEducativoId, string username, 
+            string name, string correoElectronico, int? rolId)
+        {
+            //Por nombre, rol y centros educativo
+            if (!string.IsNullOrWhiteSpace(name) && rolId.HasValue && centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var userByNameRolAndSchool = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedUserDataByNameRolSchoolCount {0}, {1}, {2}", name, rolId, centroEducativoId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return userByNameRolAndSchool;
+            }
+            //Por nombre y rol
+            else if (!string.IsNullOrWhiteSpace(name) && rolId.HasValue && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var usersByNameAndRole = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByNameRoleCount {0}, {1}", name, rolId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return usersByNameAndRole;
+            }
+            //Por nombre y centro educativo 
+            else if (!string.IsNullOrWhiteSpace(name) && !rolId.HasValue && centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var usersByNameAndSchools = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByNameSchoolsCount {0}, {1}", name, centroEducativoId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return usersByNameAndSchools;
+            }
+            //Por centro educativo y rol 
+            else if (centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name)
+                && string.IsNullOrWhiteSpace(correoElectronico) && rolId.HasValue)
+            {
+                var userBySchoolsAndRoles = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedUserDataBySchoolsRolesCount {0}, {1}", centroEducativoId, rolId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return userBySchoolsAndRoles;
+            }
+            //Por nombre
+            else if (!string.IsNullOrWhiteSpace(name) && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(correoElectronico) && !rolId.HasValue)
+            {
+                var usersByName = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("Execute spGetPaginatedUsersByNameDataCount {0}", name)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return usersByName;
+            }
+            //Por centros educativos
+            else if (centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name)
+                && string.IsNullOrWhiteSpace(correoElectronico) && !rolId.HasValue)
+            {
+                var usersByCentroEducativoId = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataBySchoolsCount {0}", centroEducativoId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return usersByCentroEducativoId;
+            }
+            //Por rol
+            else if (rolId.HasValue && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
+                && string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(correoElectronico))
+            {
+                var usersByRolId = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByRoleCount {0}", rolId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return usersByRolId;
+            }
+
+            return (await _dbContext.TotalRecordsModel.FromSqlRaw("EXECUTE spGetAllPaginatedUsersDataCount").ToListAsync()).FirstOrDefault().RecordsTotal;
         }
     }
 }
