@@ -37,23 +37,6 @@ namespace haf_science_api.Controllers
         //        throw;
         //    }
         //}
-        [Route("{id}")]
-        [HttpGet]
-        [Authorize]
-        public async Task<ActionResult> GetById(int id)
-        {
-            try
-            {
-                var users = await _userService.GetUsuarioById(id);
-
-                return Ok(users);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-                throw;
-            }
-        }
         [HttpGet]
         [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> GetPaginated([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
