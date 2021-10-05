@@ -19,32 +19,18 @@ namespace haf_science_api.Controllers
         {
             _userService = userService;
         }
-        //[HttpGet]
-        //[Authorize(Roles = "Administrador")]
-        //public async Task<ActionResult> Get([FromQuery] int page, [FromQuery]int pageSize)
-        //{
-        //    try
-        //    {
-        //        var users = await _userService.GetPaginatedUsers(page, pageSize);
-        //        var totalRecords = await _userService.GetPaginatedUsersCount();
-
-        //        return StatusCode(StatusCodes.Status200OK,
-        //            new PaginatedResponse<UsuarioView> { Records = users, RecordsTotal = totalRecords});
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-        //}
         [HttpGet]
         [Authorize(Roles = "Administrador")]
-        public async Task<ActionResult> GetPaginated([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
+        public async Task<ActionResult> Get([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
         {
-            //Faltan los query por roles y centros educativos;
             if (id.HasValue)
             {
                 var user = await _userService.GetUsuarioById((int)id);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
                 return Ok(user);
             }
@@ -63,6 +49,35 @@ namespace haf_science_api.Controllers
 
                 return StatusCode(StatusCodes.Status200OK,
                     new PaginatedResponse<UsuarioView> { Records = users, RecordsTotal = totalRecords });
+            }
+        }
+        [HttpPut]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult> Update([FromBody]UsuarioModel usuario)
+        {
+            if (usuario != null)
+            {
+                await _userService.Update(usuario);
+
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+        [HttpDelete]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                await _userService.Delete(id);
+
+                return Ok(id);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                throw;
             }
         }
 

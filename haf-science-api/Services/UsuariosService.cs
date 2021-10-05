@@ -63,13 +63,45 @@ namespace haf_science_api.Services
                 throw new Exception(ex.ToString());
             }
         }
-        public async Task Update(UsuarioModel dataObject)
+        public async Task Update(UsuarioModel user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var parameters = new object[]
+                {
+                    user.Id,
+                    user.Nombres,
+                    user.Apellidos,
+                    user.FechaNacimiento,
+                    user.Telefono,
+                    user.CorreoElectronico,
+                    user.NombreUsuario,
+                    user.RolId,
+                    user.EstadoId,
+                    user.CentroEducativoId
+                };
+
+                await _dbContext.Database
+                    .ExecuteSqlRawAsync("spUpdateUserData {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}",
+                    parameters);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.ToString());
+            }
         }
         public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _dbContext.Database.ExecuteSqlRawAsync("spDeleteUser {0}", id);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task Register(UsuarioModel user)
@@ -97,7 +129,8 @@ namespace haf_science_api.Services
                 user.CreadoPor
                 };
 
-                await _dbContext.Database.ExecuteSqlRawAsync("spRegisterUser {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}",
+                await _dbContext.Database
+                    .ExecuteSqlRawAsync("spRegisterUser {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}",
                     parameters);
             }
             catch (Exception)
