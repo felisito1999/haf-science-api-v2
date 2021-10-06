@@ -14,7 +14,6 @@ namespace haf_science_api.Models
         public string CorreoElectronico { get; set; }
         public string NombreUsuario { get; set; }
         public int RolId { get; set; }
-        public int EstadoId { get; set; }
         public int CentroEducativoId { get; set; }
         public int CreadoPor { get; set; }
     }

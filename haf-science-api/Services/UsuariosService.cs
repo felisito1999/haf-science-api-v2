@@ -41,6 +41,7 @@ namespace haf_science_api.Services
                         return user;
                     }
                 }
+
                 return user;
             }
             catch (Exception ex)
@@ -124,13 +125,12 @@ namespace haf_science_api.Services
                 stringSalt,
                 hashedNewPassword,
                 user.RolId,
-                user.EstadoId,
                 user.CentroEducativoId,
                 user.CreadoPor
                 };
 
                 await _dbContext.Database
-                    .ExecuteSqlRawAsync("spRegisterUser {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}",
+                    .ExecuteSqlRawAsync("spRegisterUser {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}",
                     parameters);
             }
             catch (Exception)
