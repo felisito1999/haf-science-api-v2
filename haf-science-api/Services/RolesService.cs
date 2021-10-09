@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace haf_science_api.Services
 {
-    public class RolesService : IDataService<Role>
+    public class RolesService : IDataService<Role, RolView>
     {
         private readonly HafScienceDbContext _dbContext;
         public RolesService(HafScienceDbContext dbContext)
@@ -41,6 +41,26 @@ namespace haf_science_api.Services
         }
 
         public Task<IEnumerable<Role>> GetByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<RolView>> GetPaginatedData(int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<RolView>> GetPaginatedDataBy(int page, int pageSize, string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetPaginatedUsersCount()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetPaginatedUsersCountBy(string name)
         {
             throw new NotImplementedException();
         }

@@ -14,8 +14,8 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly IDataService<Role> _rolesService;
-        public RolesController(IDataService<Role> rolesService)
+        private readonly IDataService<Role, RolView> _rolesService;
+        public RolesController(IDataService<Role, RolView> rolesService)
         {
             _rolesService = rolesService;
         }

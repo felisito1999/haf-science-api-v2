@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace haf_science_api.Services
 {
-    public class EstadosService : IDataService<Estado>
+    public class EstadosService : IDataService<Estado, EstadosView>
     {
         private readonly HafScienceDbContext _dbContext;
 
@@ -35,6 +35,26 @@ namespace haf_science_api.Services
         }
 
         public Task<IEnumerable<Estado>> GetByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<EstadosView>> GetPaginatedData(int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<EstadosView>> GetPaginatedDataBy(int page, int pageSize, string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetPaginatedUsersCount()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetPaginatedUsersCountBy(string name)
         {
             throw new NotImplementedException();
         }

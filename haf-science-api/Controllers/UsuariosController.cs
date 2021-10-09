@@ -3,6 +3,7 @@ using haf_science_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,40 +16,50 @@ namespace haf_science_api.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IUserService<UsuarioModel> _userService;
-        public UsuariosController(IUserService<UsuarioModel> userService)
+        private readonly ILogger _logger;
+        public UsuariosController(IUserService<UsuarioModel> userService, ILogger<UsuariosController> logger)
         {
             _userService = userService;
+            _logger = logger; 
         }
         [HttpGet]
         [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Get([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
         {
-            if (id.HasValue)
+            try
             {
-                var user = await _userService.GetUsuarioById((int)id);
-
-                if (user == null)
+                if (id.HasValue)
                 {
-                    return NotFound();
+                    var user = await _userService.GetUsuarioById((int)id);
+
+                    if (user == null)
+                    {
+                        return NotFound();
+                    }
+
+                    return Ok(user);
                 }
+                if (!string.IsNullOrWhiteSpace(name) | centroEducativoId.HasValue | !string.IsNullOrWhiteSpace(username) | !string.IsNullOrWhiteSpace(correoElectronico) | rolId.HasValue)
+                {
+                    var users = await _userService.GetPaginatedUsersBy(page, pageSize, centroEducativoId, username, name, correoElectronico, rolId);
+                    var totalRecords = await _userService.GetPaginatedUsersCountBy(centroEducativoId, username, name, correoElectronico, rolId);
 
-                return Ok(user);
+                    return StatusCode(StatusCodes.Status200OK,
+                        new PaginatedResponse<PaginatedUsuariosView> { Records = users, RecordsTotal = totalRecords });
+                }
+                else
+                {
+                    var users = await _userService.GetPaginatedUsers(page, pageSize);
+                    var totalRecords = await _userService.GetPaginatedUsersCount();
+
+                    return StatusCode(StatusCodes.Status200OK,
+                        new PaginatedResponse<PaginatedUsuariosView> { Records = users, RecordsTotal = totalRecords });
+                }
             }
-            if(!string.IsNullOrWhiteSpace(name) | centroEducativoId.HasValue | !string.IsNullOrWhiteSpace(username) | !string.IsNullOrWhiteSpace(correoElectronico) | rolId.HasValue)
+            catch (Exception ex)
             {
-                var users = await _userService.GetPaginatedUsersBy(page, pageSize, centroEducativoId, username, name, correoElectronico, rolId);
-                var totalRecords = await _userService.GetPaginatedUsersCountBy(centroEducativoId, username, name, correoElectronico, rolId);
-
-                return StatusCode(StatusCodes.Status200OK,
-                    new PaginatedResponse<UsuarioView> { Records = users, RecordsTotal = totalRecords });
-            }
-            else
-            {
-                var users = await _userService.GetPaginatedUsers(page, pageSize);
-                var totalRecords = await _userService.GetPaginatedUsersCount();
-
-                return StatusCode(StatusCodes.Status200OK,
-                    new PaginatedResponse<UsuarioView> { Records = users, RecordsTotal = totalRecords });
+                _logger.LogInformation(ex.ToString());
+                throw new Exception(ex.ToString());
             }
         }
         [HttpPut]

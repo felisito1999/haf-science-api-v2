@@ -15,15 +15,15 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class EstadosController : ControllerBase
     {
-        private readonly IDataService<Estado> _estadosService;
-        public EstadosController(IDataService<Estado> estadosService)
+        private readonly IDataService<Estado, EstadosView> _estadosService;
+        public EstadosController(IDataService<Estado, EstadosView> estadosService)
         {
             _estadosService = estadosService;
         }
         [Route("get")]
         [Authorize(Roles = "Administrador")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Estado>>> Get()
+        public async Task<ActionResult<IEnumerable<EstadosView>>> Get()
         {
             var estados = await _estadosService.GetAll();
 

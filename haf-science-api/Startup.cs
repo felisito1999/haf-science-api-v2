@@ -61,9 +61,9 @@ namespace haf_science_api
             services.Configure<Options.PasswordOptions>(Configuration.GetSection("PasswordOptions"));
 
             //Controllers and data services
-            services.AddScoped<IDataService<Estado>, EstadosService>();
-            services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
-            services.AddScoped<IDataService<Role>, RolesService>();
+            services.AddScoped<IDataService<Estado, EstadosView>, EstadosService>();
+            services.AddScoped<IDataService<CentrosEducativo, PaginatedCentrosEducativosView>, CentrosEducativosService>();
+            services.AddScoped<IDataService<Role, RolView>, RolesService>();
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
             //services.AddScoped<IDataService<Estado>, EstadosService>();
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
@@ -118,6 +118,10 @@ namespace haf_science_api
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "haf_science_api v1"));
+            }
+            else
+            {
+                app.UseExceptionHandler("/error");
             }
 
             app.UseHttpsRedirection();

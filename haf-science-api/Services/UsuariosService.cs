@@ -156,9 +156,9 @@ namespace haf_science_api.Services
             return user;
         }
 
-        public async Task<IEnumerable<UsuarioView>> GetPaginatedUsers(int page, int pageSize)
+        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsers(int page, int pageSize)
         {
-            var users = await _dbContext.UsuariosView
+            var users = await _dbContext.PaginatedUsuariosView
                 .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
                 .ToListAsync();
 
@@ -173,14 +173,14 @@ namespace haf_science_api.Services
             return count.RecordsTotal;
         }
 
-        public async Task<IEnumerable<UsuarioView>> GetPaginatedUsersBy(int page, int pageSize, 
+        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsersBy(int page, int pageSize, 
             int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
         {
             //Por nombre, rol y centro educativo
             if (!string.IsNullOrWhiteSpace(name) && rolId.HasValue && centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
                 && string.IsNullOrWhiteSpace(correoElectronico))
             {
-                var userByNameRolAndSchool = await _dbContext.UsuariosView
+                var userByNameRolAndSchool = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUserDataByNameRoleSchool {0}, {1}, {2}, {3}, {4}", page, pageSize, name, rolId, centroEducativoId)
                     .ToListAsync();
 
@@ -190,7 +190,7 @@ namespace haf_science_api.Services
             else if (!string.IsNullOrWhiteSpace(name) && rolId.HasValue && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
                 && string.IsNullOrWhiteSpace(correoElectronico))
             {
-                var usersByNameAndRoleId = await _dbContext.UsuariosView
+                var usersByNameAndRoleId = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByNameRole {0}, {1}, {2}, {3}", page, pageSize, name, rolId)
                     .ToListAsync();
 
@@ -200,7 +200,7 @@ namespace haf_science_api.Services
             else if (!string.IsNullOrWhiteSpace(name) && !rolId.HasValue && centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
                 && string.IsNullOrWhiteSpace(correoElectronico))
             {
-                var usersByNameAndSchools = await _dbContext.UsuariosView
+                var usersByNameAndSchools = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByNameSchools {0}, {1}, {2}, {3}", page, pageSize, name, centroEducativoId)
                     .ToListAsync();
 
@@ -210,7 +210,7 @@ namespace haf_science_api.Services
             else if (centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name)
                 && string.IsNullOrWhiteSpace(correoElectronico) && rolId.HasValue)
             {
-                var usersBySchoolsAndRol = await _dbContext.UsuariosView
+                var usersBySchoolsAndRol = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUserDataBySchoolsRoles {0}, {1}, {2}, {3}", page, pageSize, centroEducativoId, rolId)
                     .ToListAsync();
 
@@ -220,7 +220,7 @@ namespace haf_science_api.Services
             else if (!string.IsNullOrWhiteSpace(name) && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) 
                 && string.IsNullOrWhiteSpace(correoElectronico) && !rolId.HasValue)
             {
-                var usersByName = await _dbContext.UsuariosView
+                var usersByName = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUsersDataByName {0}, {1}, {2}", page, pageSize, name)
                     .ToListAsync();
 
@@ -230,7 +230,7 @@ namespace haf_science_api.Services
             else if (centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username) && string.IsNullOrWhiteSpace(name) 
                 && string.IsNullOrWhiteSpace(correoElectronico) && !rolId.HasValue)
             {
-                var usersByCentroEducativoId = await _dbContext.UsuariosView
+                var usersByCentroEducativoId = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUserDataBySchools {0}, {1}, {2}", page, pageSize, centroEducativoId)
                     .ToListAsync();
 
@@ -240,7 +240,7 @@ namespace haf_science_api.Services
             else if (rolId.HasValue && !centroEducativoId.HasValue && string.IsNullOrWhiteSpace(username)
                 && string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(correoElectronico))
             {
-                var usersByRolId = await _dbContext.UsuariosView
+                var usersByRolId = await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetPaginatedUserDataByRole {0}, {1}, {2}", page, pageSize, rolId)
                     .ToListAsync();
 
@@ -248,7 +248,7 @@ namespace haf_science_api.Services
             }
 
 
-            return await _dbContext.UsuariosView
+            return await _dbContext.PaginatedUsuariosView
                     .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
                     .ToListAsync();
         }

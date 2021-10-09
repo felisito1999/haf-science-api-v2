@@ -28,21 +28,34 @@ namespace haf_science_api.Controllers
         [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Register([FromBody] RegistrationModel model)
         {
-            var userExists = await _usersService.GetUsuarioByUsername(model.NombreUsuario);
-
-            if (userExists != null)
+            try
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "No se pudo registrar el usuario" });
+                var userExists = await _usersService.GetUsuarioByUsername(model.NombreUsuario);
+
+                if (userExists != null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new Response { Status = "Error", Message = "No se pudo registrar el usuario" });
+                }
+
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                model.CreadoPor = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                await _usersService.Register(_mapper.Map<UsuarioModel>(model));
+
+                return StatusCode(StatusCodes.Status200OK,
+                    new Response { Status = "Success", Message = "Se ha registrado el usuario exitosamente" });
             }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new Response() { 
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
 
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            model.CreadoPor = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
-
-            await _usersService.Register(_mapper.Map<UsuarioModel>(model));
-
-            return StatusCode(StatusCodes.Status200OK,
-                new Response { Status = "Success", Message = "Se ha registrado el usuario exitosamente" });
+                throw;
+            }
         }
         [HttpPost]
         [Route("token")]
@@ -78,7 +91,7 @@ namespace haf_science_api.Controllers
         [HttpPost]
         [Route("logout")]
         [Authorize]
-        public async Task<ActionResult> Logout()
+        public ActionResult Logout()
         {
             return Ok();
         }
@@ -94,7 +107,7 @@ namespace haf_science_api.Controllers
         }
         [HttpPost]
         [Route("check")]
-        public async Task<ActionResult> CheckUserIsLoggedIn()
+        public ActionResult CheckUserIsLoggedIn()
         {
             var isUserLoggedIn = this.User.Identity.IsAuthenticated;
 
