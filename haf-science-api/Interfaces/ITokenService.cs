@@ -9,6 +9,6 @@ namespace haf_science_api.Interfaces
 {
     public interface ITokenService
     {
-        public string WriteToken(UsuarioModel user);
+        public string WriteToken(UsuariosModel user);
     }
 }

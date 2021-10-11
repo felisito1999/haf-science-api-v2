@@ -15,9 +15,9 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
-        private readonly IUserService<UsuarioModel> _userService;
+        private readonly IUserService<UsuariosModel> _userService;
         private readonly ILogger _logger;
-        public UsuariosController(IUserService<UsuarioModel> userService, ILogger<UsuariosController> logger)
+        public UsuariosController(IUserService<UsuariosModel> userService, ILogger<UsuariosController> logger)
         {
             _userService = userService;
             _logger = logger; 
@@ -64,7 +64,7 @@ namespace haf_science_api.Controllers
         }
         [HttpPut]
         [Authorize(Roles = "Administrador")]
-        public async Task<ActionResult> Update([FromBody]UsuarioModel usuario)
+        public async Task<ActionResult> Update([FromBody]UsuariosModel usuario)
         {
             if (usuario != null)
             {

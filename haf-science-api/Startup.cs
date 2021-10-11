@@ -62,7 +62,7 @@ namespace haf_science_api
 
             //Controllers and data services
             services.AddScoped<IDataService<Estado, EstadosView>, EstadosService>();
-            services.AddScoped<IDataService<CentrosEducativo, PaginatedCentrosEducativosView>, CentrosEducativosService>();
+            services.AddScoped<IDataService<CentrosEducativosModel, PaginatedCentrosEducativosView>, CentrosEducativosService>();
             services.AddScoped<IDataService<Role, RolView>, RolesService>();
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
             //services.AddScoped<IDataService<Estado>, EstadosService>();
@@ -82,7 +82,7 @@ namespace haf_science_api
             //services.AddScoped<IDataService<Estado>, EstadosService>();
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
 
-            services.AddScoped<IUserService<UsuarioModel>, UsuariosService>();
+            services.AddScoped<IUserService<UsuariosModel>, UsuariosService>();
             
             services.AddScoped<ITokenService, TokenService>();
 

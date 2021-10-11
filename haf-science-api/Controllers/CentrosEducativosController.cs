@@ -15,10 +15,10 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class CentrosEducativosController : ControllerBase
     {
-        private readonly IDataService<CentrosEducativo, PaginatedCentrosEducativosView> _centrosEducativosService;
+        private readonly IDataService<CentrosEducativosModel, PaginatedCentrosEducativosView> _centrosEducativosService;
         private readonly ILogger _logger;
 
-        public CentrosEducativosController(IDataService<CentrosEducativo, PaginatedCentrosEducativosView> centrosEducativosService,
+        public CentrosEducativosController(IDataService<CentrosEducativosModel, PaginatedCentrosEducativosView> centrosEducativosService,
         ILogger<CentrosEducativosController> logger)
         {
             _centrosEducativosService = centrosEducativosService;
@@ -112,7 +112,7 @@ namespace haf_science_api.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "Administrador")]
-        public async Task<ActionResult> SaveSchool([FromBody] CentrosEducativo centroEducativo)
+        public async Task<ActionResult> SaveSchool([FromBody] CentrosEducativosModel centroEducativo)
         {
             try
             {
@@ -135,7 +135,9 @@ namespace haf_science_api.Controllers
                 throw;
             }
         }
-        public async Task<ActionResult> UpdateSchool([FromBody] CentrosEducativo centrosEducativo)
+        [HttpPut]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult> UpdateSchool([FromBody] CentrosEducativosModel centrosEducativo)
         {
             try
             {
@@ -145,6 +147,31 @@ namespace haf_science_api.Controllers
                 {
                     Status = "Success",
                     Message = "El centro educativo fue actualizado con satisfactoriamente."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
+        [HttpDelete]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult> DeleteSchool(int id)
+        {
+            try
+            {
+                await _centrosEducativosService.Delete(id);
+
+                return Ok(new Response()
+                {
+                    Status = "Success",
+                    Message = "El centro educativo fue deshabilitado satisfactoriamente"
                 });
             }
             catch (Exception ex)

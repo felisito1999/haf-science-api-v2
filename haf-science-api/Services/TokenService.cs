@@ -19,7 +19,7 @@ namespace haf_science_api.Services
         {
             _configuration = configuration;
         }
-        public string WriteToken(UsuarioModel user)
+        public string WriteToken(UsuariosModel user)
         {
             try
             {

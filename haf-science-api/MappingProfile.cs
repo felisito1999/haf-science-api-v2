@@ -11,12 +11,12 @@ namespace haf_science_api
     {
         public MappingProfile()
         {
-            CreateMap<UsuarioModel, RegistrationModel>();
-            CreateMap<RegistrationModel, UsuarioModel>();
-            CreateMap<UsuarioModel, Usuario>();
-            CreateMap<Usuario, UsuarioModel>();
-            CreateMap<UserInfo, UsuarioModel>();
-            CreateMap<UsuarioModel, UserInfo>();
+            CreateMap<UsuariosModel, RegistrationModel>();
+            CreateMap<RegistrationModel, UsuariosModel>();
+            CreateMap<UsuariosModel, Usuario>();
+            CreateMap<Usuario, UsuariosModel>();
+            CreateMap<UserInfo, UsuariosModel>();
+            CreateMap<UsuariosModel, UserInfo>();
         }
     }
 }

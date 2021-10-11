@@ -14,10 +14,10 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUserService<UsuarioModel> _usersService;
+        private readonly IUserService<UsuariosModel> _usersService;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
-        public AuthenticationController(IUserService<UsuarioModel> usersService, IMapper mapper, ITokenService tokenService)
+        public AuthenticationController(IUserService<UsuariosModel> usersService, IMapper mapper, ITokenService tokenService)
         {
             _usersService = usersService;
             _mapper = mapper;
@@ -41,7 +41,7 @@ namespace haf_science_api.Controllers
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 model.CreadoPor = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
-                await _usersService.Register(_mapper.Map<UsuarioModel>(model));
+                await _usersService.Register(_mapper.Map<UsuariosModel>(model));
 
                 return StatusCode(StatusCodes.Status200OK,
                     new Response { Status = "Success", Message = "Se ha registrado el usuario exitosamente" });
