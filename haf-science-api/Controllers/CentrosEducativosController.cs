@@ -30,7 +30,6 @@ namespace haf_science_api.Controllers
         {
             try
             {
-
                 var centrosEducativos = await _centrosEducativosService.GetAll();
 
                 return Ok(centrosEducativos);
@@ -39,7 +38,7 @@ namespace haf_science_api.Controllers
             {
                 _logger.LogInformation(ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
-                throw new Exception(ex.ToString());
+                throw;
             }
         }
         [HttpGet]
