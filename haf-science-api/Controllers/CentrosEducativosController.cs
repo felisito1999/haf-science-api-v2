@@ -63,9 +63,13 @@ namespace haf_science_api.Controllers
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new Response() { 
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
 
                 throw;
             }

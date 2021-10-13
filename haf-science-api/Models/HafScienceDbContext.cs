@@ -28,6 +28,7 @@ namespace haf_science_api.Models
         public virtual DbSet<PaginatedCentrosEducativosView> PaginatedCentrosEducativosView { get; set; }
         public virtual DbSet<CentrosEducativosModel> CentrosEducativosModel { get; set; }
         public virtual DbSet<RecordsTotalModel> TotalRecordsModel { get; set; }
+        public virtual DbSet<CentrosEducativosSelectModel> CentrosEducativosSelectModel { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

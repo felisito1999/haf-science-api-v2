@@ -14,7 +14,7 @@ namespace haf_science_api.Services
     {
         private readonly HafScienceDbContext _dbContext;
         private readonly ILogger _logger;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
         public CentrosEducativosService(HafScienceDbContext dbContext, IMapper mapper, ILogger<CentrosEducativosService> logger)
         {
             _dbContext = dbContext;
@@ -102,9 +102,9 @@ namespace haf_science_api.Services
         {
             try
             {
-                var centrosEducativos = await _dbContext.CentrosEducativosModel.FromSqlRaw("EXECUTE spGetSchoolsByName {0}", name).ToListAsync();
+                var centrosEducativos = await _dbContext.CentrosEducativosSelectModel.FromSqlRaw("EXECUTE spGetSchoolsByName {0}", name).ToListAsync();
 
-                return centrosEducativos;
+                return _mapper.Map<List<CentrosEducativosSelectModel>, IEnumerable<CentrosEducativosModel>>(centrosEducativos);
             }
             catch (Exception ex)
             {

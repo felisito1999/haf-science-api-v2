@@ -15,13 +15,11 @@ namespace haf_science_api.Services
     {
         private readonly HafScienceDbContext _dbContext;
         private readonly IPasswordService _passwordService;
-        private readonly IMapper _mapper;
         private readonly ILogger _logger;
-        public UsuariosService(HafScienceDbContext dbContext, IPasswordService passwordService, IMapper mapper, ILogger<UsuariosService> logger)
+        public UsuariosService(HafScienceDbContext dbContext, IPasswordService passwordService, ILogger<UsuariosService> logger)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;
-            _mapper = mapper;
             _logger = logger; 
         }
         public async Task<UsuariosModel> GetUsuarioLoginInfo(string username, string password)
