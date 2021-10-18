@@ -1,6 +1,7 @@
 ﻿using haf_science_api.Interfaces;
 using haf_science_api.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,11 @@ namespace haf_science_api.Services
     public class TokenService : ITokenService
     {
         public IConfiguration _configuration;
-        public TokenService(IConfiguration configuration)
+        private readonly ILogger _logger;
+        public TokenService(IConfiguration configuration, ILogger<TokenService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
         public string WriteToken(UsuariosModel user)
         {
@@ -44,9 +47,9 @@ namespace haf_science_api.Services
 
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogInformation(ex.ToString());
                 throw;
             }
         }

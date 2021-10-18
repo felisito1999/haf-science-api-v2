@@ -1,4 +1,5 @@
-﻿using System;
+﻿using haf_science_api.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,11 +10,8 @@ namespace haf_science_api.Interfaces
         where T : class
         where TPaginatedView : class
     {
-        Task<IEnumerable<T>> GetAll();
-        Task<T> GetById(int? id);
-        Task<IEnumerable<T>> GetByName(string name);
-        Task SaveSingle(T session);
-        Task SaveMultiple(IEnumerable<T> sessionCollection);
+        Task<T> GetById(int id);
+        Task Save(T session, IEnumerable<SessionStudents> sessionStudents);
         Task Update(T session);
         Task Delete(int id);
         public Task<IEnumerable<TPaginatedView>> GetPaginatedSessions(int page, int pageSize);
@@ -21,8 +19,11 @@ namespace haf_science_api.Interfaces
         public Task<IEnumerable<TPaginatedView>> GetPaginatedSessionsBy(int page, int pageSize,
              string name, int? centroEducativoId);
         public Task<int> GetPaginatedSessionsCountBy(string name, int? centroEducativo);
-        public Task<IEnumerable<TPaginatedView>> GetPaginatedUserSessionsDataBy(int page, int pageSize,
+        public Task<IEnumerable<TPaginatedView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize,
              int teacherId);
-        public Task<int> GetPaginatedUserSessionsCountBy(int teacherId);
+        public Task<int> GetPaginatedTeacherSessionsCountBy(int teacherId);
+        public Task<IEnumerable<TPaginatedView>> GetPaginatedStudentSessionsDataBy(int page, int pageSize,
+             int studentId);
+        public Task<int> GetPaginatedStudentSessionsCountBy(int studentId);
     }
 }
