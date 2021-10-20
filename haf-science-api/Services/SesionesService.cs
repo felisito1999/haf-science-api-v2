@@ -194,14 +194,89 @@ namespace haf_science_api.Services
             throw new NotImplementedException();
         }
 
-        public Task<int> GetPaginatedTeacherSessionsCountBy(int teacherId)
+        public async Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessions(int page, int pageSize, int teacherId)
+        {
+            try
+            {
+                var sessions = await _dbContext.PaginatedSesionesView
+                    .FromSqlRaw("EXECUTE spGetPaginatedTeachersSessions {0}, {1}, {2}", page, pageSize, teacherId)
+                    .ToListAsync();
+
+                return sessions;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<int> GetPaginatedTeacherSessionsCountBy(int teacherId, string name)
+        {
+            try
+            {
+                var totalRecords = (await _dbContext.TotalRecordsModel
+                .FromSqlRaw("EXECUTE spPaginatedTeacherSessionsCountBy {0}, {1}", teacherId, name)
+                .ToListAsync())
+                .FirstOrDefault()
+                .RecordsTotal;
+
+                return totalRecords;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize, int teacherId, string name)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    var sessions = await _dbContext
+                    .PaginatedSesionesView
+                    .FromSqlRaw("EXECUTE spGetPaginatedTeachersSessionsByName {0}, {1}, {2}, {3}", page, pageSize, teacherId, name)
+                    .ToListAsync();
+
+                    return sessions;
+                }
+                else
+                {
+                    return await GetPaginatedTeacherSessions(page, pageSize, teacherId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize, int? teacherId, string name)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize, int teacherId)
+        public async Task<int> GetPaginatedTeacherSessionsCount(int teacherId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var totalRecords = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedTeachersSessionsCount {0}", teacherId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return totalRecords;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
         }
 
         public async Task Save(SesionesModel session, IEnumerable<SessionStudents> sessionStudents)
