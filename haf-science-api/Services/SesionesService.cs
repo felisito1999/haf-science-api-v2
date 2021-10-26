@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace haf_science_api.Services
@@ -17,11 +18,13 @@ namespace haf_science_api.Services
         private readonly HafScienceDbContext _dbContext;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
-        public SesionesService(HafScienceDbContext dbContext, ILogger<SesionesService> logger, IMapper mapper)
+        private readonly IUserService<UsuariosModel> _usuariosService;
+        public SesionesService(HafScienceDbContext dbContext, ILogger<SesionesService> logger, IMapper mapper, IUserService<UsuariosModel> usuariosService)
         {
             _dbContext = dbContext;
             _logger = logger;
             _mapper = mapper;
+            _usuariosService = usuariosService; 
         }
 
         public async Task Delete(int id)
@@ -279,27 +282,37 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task Save(SesionesModel session, IEnumerable<SessionStudents> sessionStudents)
+        public async Task Save(SessionSaveModel session, int userId)
         {
             try
             {
+                SessionStudentsCollection sessionStudentsCollection = new SessionStudentsCollection();
+
+                foreach(var item in session.UsuariosSesiones)
+                {
+                    item.NombreSesion = session.Nombre;
+                    sessionStudentsCollection.Add(item);
+                };
+
+                var teacherInfo = await _usuariosService.GetUsuarioById(userId);
+                
                 var usersParam = new SqlParameter("UsuariosSesiones", SqlDbType.Structured)
                 {
-                    Value = sessionStudents,
+                    Value = sessionStudentsCollection,
                     TypeName = "dbo.BulkSessionStudents",
                     Direction = ParameterDirection.Input
                 };
-
+                
                 var parameters = new object[]
                 {
                 session.Nombre,
                 session.Descripcion,
-                session.CentroEducativoId,
-                session.CreadoPor,
+                teacherInfo.CentroEducativoId,
+                teacherInfo.Id,
                 usersParam
                 };
 
-                var result = await _dbContext.Database.ExecuteSqlRawAsync("spSaveSessionWithStudents", parameters);
+                var result = await _dbContext.Database.ExecuteSqlRawAsync("spSaveSessionWithStudents {0}, {1}, {2}, {3}, {4}", parameters);
             }
             catch (Exception ex)
             {
@@ -311,6 +324,24 @@ namespace haf_science_api.Services
         public Task Update(SesionesModel session)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<SesionesModel> GetTeacherSessionsById(int id, int teacherId)
+        {
+            try
+            {
+                var session = (await _dbContext.SesionesModel
+                    .FromSqlRaw("EXECUTE spGetTeacherSessionById {0}, {1}", id, teacherId)
+                    .ToListAsync())
+                    .FirstOrDefault();
+
+                return session;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
         }
     }
 }

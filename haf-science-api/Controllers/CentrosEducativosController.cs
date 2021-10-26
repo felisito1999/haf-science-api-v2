@@ -43,7 +43,7 @@ namespace haf_science_api.Controllers
         }
         [HttpGet]
         [Route("GetByName")]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador,Docente")]
         public async Task<ActionResult> GetByName(string name)
         {
             try

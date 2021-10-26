@@ -11,7 +11,8 @@ namespace haf_science_api.Interfaces
         where TPaginatedView : class
     {
         Task<T> GetById(int id);
-        Task Save(T session, IEnumerable<SessionStudents> sessionStudents);
+        Task<T> GetTeacherSessionsById(int id, int teacherId);
+        Task Save(SessionSaveModel session, int userId);
         Task Update(T session);
         Task Delete(int id);
         public Task<IEnumerable<TPaginatedView>> GetPaginatedSessions(int page, int pageSize);

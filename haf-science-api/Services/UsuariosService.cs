@@ -390,5 +390,117 @@ namespace haf_science_api.Services
                 throw;
             }
         }
+
+        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedTeacherStudents(int page, int pageSize, int teacherId)
+        {
+            try
+            {
+                var users = await _dbContext.PaginatedUsuariosView
+                    .FromSqlRaw("EXECUTE spGetPaginatedTeacherStudents {0}, {1}, {2}", page, pageSize, teacherId)
+                    .ToListAsync();
+
+                return users;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<int> GetPaginatedTeacherStudentsCount(int teacherId)
+        {
+            try
+            {
+                var count = (await _dbContext.TotalRecordsModel
+                    .FromSqlRaw("EXECUTE spGetPaginatedTeacherStudentsCount {0}", teacherId)
+                    .ToListAsync())
+                    .FirstOrDefault()
+                    .RecordsTotal;
+
+                return count; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedTeacherStudentsDataBy(int page, int pageSize, int teacherId, string name)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    var users = await _dbContext.PaginatedUsuariosView
+                        .FromSqlRaw("EXECUTE spGetPaginatedTeacherStudentsByName {0}, {1}, {2}, {3}", page, pageSize, teacherId, name)
+                        .ToListAsync();
+
+                    return users; 
+                }
+                else
+                {
+                    var users = await GetPaginatedTeacherStudents(page, pageSize, teacherId);
+
+                    return users; 
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<int> GetPaginatedTeacherStudentsCountBy(int teacherId, string name)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    var recordsTotal = (await _dbContext.TotalRecordsModel
+                        .FromSqlRaw("EXECUTE spGetPaginatedTeacherStudentsByNameCount {0}, {1}", teacherId, name)
+                        .ToListAsync())
+                        .FirstOrDefault()
+                        .RecordsTotal;
+
+                    return recordsTotal; 
+                }
+                else
+                {
+                    var recordsTotal = (await _dbContext.TotalRecordsModel
+                        .FromSqlRaw("spGetPaginatedTeacherStudentsByNameCount {0}", teacherId)
+                        .ToListAsync())
+                        .FirstOrDefault()
+                        .RecordsTotal;
+
+                    return recordsTotal; 
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<UsuariosModel> GetTeacherStudentById(int teacherId, int studentId)
+        {
+            try
+            {
+                var student = (await _dbContext.UsuariosModel
+                    .FromSqlRaw("EXECUTE spGetTeacherStudentById {0}, {1}", teacherId, studentId)
+                    .ToListAsync())
+                    .FirstOrDefault();
+
+                return student;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
     }
 }

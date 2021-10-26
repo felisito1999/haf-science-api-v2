@@ -17,16 +17,14 @@ namespace haf_science_api.Controllers
     public class SesionesController : ControllerBase
     {
         private readonly ISessionService<SesionesModel, PaginatedSesionesView> _sessionService;
-        private readonly ILogger _logger;
 
         public SesionesController(ISessionService<SesionesModel, PaginatedSesionesView> sessionService, 
             ILogger<SesionesController> logger)
         {
             _sessionService = sessionService;
-            _logger = logger; 
         }
         [Authorize]
-        public async Task<ActionResult> Get([FromQuery] int page, [FromQuery] int pageSize, int? id, int? centroEducativoId, string name)
+        public async Task<ActionResult> Get(int page, int pageSize, int? id, int? centroEducativoId, string name)
         {
             try
             {
@@ -68,35 +66,85 @@ namespace haf_science_api.Controllers
                 {
                     var teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
+                    if (id.HasValue)
+                    {
+                        var session = await _sessionService.GetById((int)id);
+
+                        return Ok(session); 
+                    }
+
                     var sessions = await _sessionService.GetPaginatedTeacherSessions(page, pageSize, teacherId);
                     var totalRecords = await _sessionService.GetPaginatedTeacherSessionsCount(teacherId);
 
                     return StatusCode(StatusCodes.Status200OK,
                         new PaginatedResponse<PaginatedSesionesView> { Records = sessions, RecordsTotal = totalRecords });
                 }
-                else
+                else 
                 {
+                    var studentId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                    var sessions = await _sessionService.GetPaginatedStudentSessionsDataBy(page, pageSize, studentId);
+                    var totalRecords = _sessionService.GetPaginatedStudentSessionsCountBy(studentId);
                     return Ok();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.ToString());
-                throw new Exception(ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
+        [HttpPost]
+        public async Task<ActionResult> Save(SessionSaveModel session)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+                await _sessionService.Save(session, teacherId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
             }
         }
         [HttpPut]
         [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Update([FromBody] SesionesModel session)
         {
-            if (session != null)
+            try
             {
-                await _sessionService.Update(session);
+                if (session != null)
+                {
+                    await _sessionService.Update(session);
 
-                return Ok();
+                    return Ok();
+                }
+
+                return BadRequest();
             }
-
-            return BadRequest();
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
         }
         [HttpDelete]
         [Authorize(Roles = "Administrador")]
@@ -106,11 +154,16 @@ namespace haf_science_api.Controllers
             {
                 await _sessionService.Delete(id);
 
-                return Ok(id);
+                return Ok();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
                 throw;
             }
         }
