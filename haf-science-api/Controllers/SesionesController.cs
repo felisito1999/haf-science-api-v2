@@ -27,8 +27,7 @@ namespace haf_science_api.Controllers
         public async Task<ActionResult> Get(int page, int pageSize, int? id, int? centroEducativoId, string name)
         {
             try
-            {
-                
+            {                
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var roleValue = claimsIdentity.Claims.ToArray()[8].Value;
 
@@ -70,14 +69,24 @@ namespace haf_science_api.Controllers
                     {
                         var session = await _sessionService.GetById((int)id);
 
-                        return Ok(session); 
+                        return Ok(session);
                     }
+                    else if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        var sessions = await _sessionService.GetPaginatedTeacherSessionsDataBy(page, pageSize, teacherId, name);
+                        var totalRecords = await _sessionService.GetPaginatedTeacherSessionsCountBy(teacherId, name);
 
-                    var sessions = await _sessionService.GetPaginatedTeacherSessions(page, pageSize, teacherId);
-                    var totalRecords = await _sessionService.GetPaginatedTeacherSessionsCount(teacherId);
+                        return StatusCode(StatusCodes.Status200OK,
+                            new PaginatedResponse<PaginatedSesionesView> { Records = sessions, RecordsTotal = totalRecords });
+                    }
+                    else
+                    {
+                        var sessions = await _sessionService.GetPaginatedTeacherSessions(page, pageSize, teacherId);
+                        var totalRecords = await _sessionService.GetPaginatedTeacherSessionsCount(teacherId);
 
-                    return StatusCode(StatusCodes.Status200OK,
-                        new PaginatedResponse<PaginatedSesionesView> { Records = sessions, RecordsTotal = totalRecords });
+                        return StatusCode(StatusCodes.Status200OK,
+                            new PaginatedResponse<PaginatedSesionesView> { Records = sessions, RecordsTotal = totalRecords });
+                    }
                 }
                 else 
                 {

@@ -279,6 +279,11 @@ namespace haf_science_api.Services
 
                     return usersByRolId;
                 }
+                //Por sesiones 
+                else if ()
+                {
+
+                }
 
 
                 return await _dbContext.PaginatedUsuariosView
@@ -427,7 +432,7 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedTeacherStudentsDataBy(int page, int pageSize, int teacherId, string name)
+        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedTeacherStudentsDataBy(int page, int pageSize, int teacherId, string name, int? sessionId)
         {
             try
             {
@@ -439,6 +444,7 @@ namespace haf_science_api.Services
 
                     return users; 
                 }
+                else if ()
                 else
                 {
                     var users = await GetPaginatedTeacherStudents(page, pageSize, teacherId);
@@ -453,7 +459,7 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task<int> GetPaginatedTeacherStudentsCountBy(int teacherId, string name)
+        public async Task<int> GetPaginatedTeacherStudentsCountBy(int teacherId, string name, int? sessionId)
         {
             try
             {
