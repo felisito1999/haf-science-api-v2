@@ -67,7 +67,7 @@ namespace haf_science_api.Controllers
 
                     if (id.HasValue)
                     {
-                        var session = await _sessionService.GetById((int)id);
+                        var session = await _sessionService.GetTeacherSessionsById((int)id, teacherId);
 
                         return Ok(session);
                     }

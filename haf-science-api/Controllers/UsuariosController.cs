@@ -26,7 +26,8 @@ namespace haf_science_api.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Administrador,Docente")]
-        public async Task<ActionResult> Get([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
+        public async Task<ActionResult> Get([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, 
+            string username, string name, string correoElectronico, int? rolId, int? sessionId)
         {
             try
             {
@@ -77,11 +78,22 @@ namespace haf_science_api.Controllers
 
                         return Ok(user);
                     }
+                    
+                    if (sessionId.HasValue)
+                    {
+                        int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+                        var users = await _userService.GetPaginatedTeacherStudentsDataBy(page, pageSize, teacherId, name, sessionId);
+                        var totalRecords = await _userService.GetPaginatedTeacherStudentsCountBy(teacherId, name, sessionId);
+
+                        return StatusCode(StatusCodes.Status200OK,
+                            new PaginatedResponse<PaginatedUsuariosView> { Records = users, RecordsTotal = totalRecords });
+                    }
+
                     if (!string.IsNullOrWhiteSpace(name) | centroEducativoId.HasValue | !string.IsNullOrWhiteSpace(username) | !string.IsNullOrWhiteSpace(correoElectronico) | rolId.HasValue)
                     {
                         var teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
-                        var users = await _userService.GetPaginatedTeacherStudentsDataBy(page, pageSize, teacherId, name);
-                        var totalRecords = await _userService.GetPaginatedTeacherStudentsCountBy(teacherId, name);
+                        var users = await _userService.GetPaginatedTeacherStudentsDataBy(page, pageSize, teacherId, name, sessionId);
+                        var totalRecords = await _userService.GetPaginatedTeacherStudentsCountBy(teacherId, name, sessionId);
 
                         return StatusCode(StatusCodes.Status200OK,
                             new PaginatedResponse<PaginatedUsuariosView> { Records = users, RecordsTotal = totalRecords });

@@ -279,12 +279,6 @@ namespace haf_science_api.Services
 
                     return usersByRolId;
                 }
-                //Por sesiones 
-                else if ()
-                {
-
-                }
-
 
                 return await _dbContext.PaginatedUsuariosView
                         .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
@@ -436,7 +430,15 @@ namespace haf_science_api.Services
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(name))
+                if (sessionId.HasValue)
+                {
+                    var user = await _dbContext.PaginatedUsuariosView
+                        .FromSqlRaw("EXECUTE spGetPaginatedTeacherUsersBySession {0}, {1}, {2}, {3}", page, pageSize, teacherId, sessionId)
+                        .ToListAsync();
+
+                    return user;
+                }
+                else if (!string.IsNullOrWhiteSpace(name))
                 {
                     var users = await _dbContext.PaginatedUsuariosView
                         .FromSqlRaw("EXECUTE spGetPaginatedTeacherStudentsByName {0}, {1}, {2}, {3}", page, pageSize, teacherId, name)
@@ -444,7 +446,6 @@ namespace haf_science_api.Services
 
                     return users; 
                 }
-                else if ()
                 else
                 {
                     var users = await GetPaginatedTeacherStudents(page, pageSize, teacherId);
@@ -463,7 +464,17 @@ namespace haf_science_api.Services
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(name))
+                if (sessionId.HasValue)
+                {
+                    var recordsTotal = (await _dbContext.TotalRecordsModel
+                        .FromSqlRaw("EXECUTE spGetPaginatedTeacherUsersBySessionCount {0}, {1}", teacherId, sessionId)
+                        .ToListAsync())
+                        .FirstOrDefault()
+                        .RecordsTotal;
+
+                    return recordsTotal;
+                }
+                else if (!string.IsNullOrWhiteSpace(name))
                 {
                     var recordsTotal = (await _dbContext.TotalRecordsModel
                         .FromSqlRaw("EXECUTE spGetPaginatedTeacherStudentsByNameCount {0}, {1}", teacherId, name)
@@ -476,7 +487,7 @@ namespace haf_science_api.Services
                 else
                 {
                     var recordsTotal = (await _dbContext.TotalRecordsModel
-                        .FromSqlRaw("spGetPaginatedTeacherStudentsByNameCount {0}", teacherId)
+                        .FromSqlRaw("spGetPaginatedTeacherStudentsCount {0}", teacherId)
                         .ToListAsync())
                         .FirstOrDefault()
                         .RecordsTotal;
