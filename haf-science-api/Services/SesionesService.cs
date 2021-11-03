@@ -233,31 +233,6 @@ namespace haf_science_api.Services
             }
         }
 
-        //public async Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize, int teacherId, string name)
-        //{
-        //    try
-        //    {
-        //        if (!string.IsNullOrWhiteSpace(name))
-        //        {
-        //            var sessions = await _dbContext
-        //            .PaginatedSesionesView
-        //            .FromSqlRaw("EXECUTE spGetPaginatedTeachersSessionsByName {0}, {1}, {2}, {3}", page, pageSize, teacherId, name)
-        //            .ToListAsync();
-
-        //            return sessions;
-        //        }
-        //        else
-        //        {
-        //            return await GetPaginatedTeacherSessions(page, pageSize, teacherId);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogInformation(ex.ToString());
-        //        throw;
-        //    }
-        //}
-
         public async Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize, int? teacherId, string name)
         {
             try
@@ -294,7 +269,7 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task Save(SessionSaveModel session, int userId)
+        public async Task Save(SessionSaveUpdateModel session, int userId)
         {
             try
             {
@@ -332,10 +307,42 @@ namespace haf_science_api.Services
                 throw;
             }
         }
-
-        public Task Update(SesionesModel session)
+        public async Task Update(SessionSaveUpdateModel session, int userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                SessionStudentsCollection sessionStudentsCollection = new SessionStudentsCollection();
+
+                foreach(var sessionStudent in session.UsuariosSesiones)
+                {
+                    sessionStudent.SessionId = session.SessionId;
+                    sessionStudent.NombreSesion = session.Nombre;
+                    sessionStudentsCollection.Add(sessionStudent);
+                };
+
+                var usuariosSesiones = new SqlParameter("UsuariosSesiones", SqlDbType.Structured)
+                {
+                    Value = sessionStudentsCollection,
+                    TypeName = "dbo.BulkSessionStudents",
+                    Direction = ParameterDirection.Input
+                };
+
+                var parameters = new object[]
+                {
+                    session.SessionId,
+                    userId,
+                    session.Nombre,
+                    session.Descripcion,
+                    usuariosSesiones
+                };
+
+                var result = await _dbContext.Database.ExecuteSqlRawAsync("spUpdateSession {0}, {1}, {2}, {3}, {4}", parameters);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
         }
 
         public async Task<SesionesModel> GetTeacherSessionsById(int id, int teacherId)

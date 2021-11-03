@@ -18,10 +18,9 @@ namespace haf_science_api.Controllers
     {
         private readonly ISessionService<SesionesModel, PaginatedSesionesView> _sessionService;
 
-        public SesionesController(ISessionService<SesionesModel, PaginatedSesionesView> sessionService, 
-            ILogger<SesionesController> logger)
+        public SesionesController(ISessionService<SesionesModel, PaginatedSesionesView> sessionService)
         {
-            _sessionService = sessionService;
+            _sessionService = sessionService;         
         }
         [Authorize]
         public async Task<ActionResult> Get(int page, int pageSize, int? id, int? centroEducativoId, string name)
@@ -109,7 +108,7 @@ namespace haf_science_api.Controllers
             }
         }
         [HttpPost]
-        public async Task<ActionResult> Save(SessionSaveModel session)
+        public async Task<ActionResult> Save(SessionSaveUpdateModel session)
         {
             try
             {
@@ -130,33 +129,40 @@ namespace haf_science_api.Controllers
             }
         }
         [HttpPut]
-        [Authorize(Roles = "Administrador")]
-        public async Task<ActionResult> Update([FromBody] SesionesModel session)
+        [Authorize(Roles = "Administrador,Docente")]
+        public async Task<ActionResult> Update([FromBody] SessionSaveUpdateModel session)
         {
             try
             {
                 if (session != null)
                 {
-                    await _sessionService.Update(session);
+                    var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                    int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+                    await _sessionService.Update(session, teacherId);
 
-                    return Ok();
+                    return StatusCode(StatusCodes.Status200OK,
+                        new Response()
+                        {
+                            Status = "Success",
+                            Message = $"La sesión {session.SessionId} ha sido actualizada exitosamente"
+                        });
                 }
 
                 return BadRequest();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response()
                     {
                         Status = "Error",
-                        Message = ex.ToString()
+                        Message = "No se pudo actualizar la sesión"
                     });
                 throw;
             }
         }
         [HttpDelete]
-        [Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador,Docente")]
         public async Task<ActionResult> Delete(int id)
         {
             try

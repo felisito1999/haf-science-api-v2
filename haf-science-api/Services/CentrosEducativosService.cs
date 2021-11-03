@@ -25,7 +25,10 @@ namespace haf_science_api.Services
         {
             try
             {
-                var centrosEducativos = await _dbContext.CentrosEducativosModel.ToListAsync();
+                var centrosEducativos = await _dbContext
+                    .CentrosEducativosModel
+                    .FromSqlRaw("EXECUTE GetAllCentrosEducativos")
+                    .ToListAsync();
 
                 return centrosEducativos;
             }
