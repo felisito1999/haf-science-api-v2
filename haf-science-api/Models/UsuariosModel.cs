@@ -12,7 +12,7 @@ namespace haf_science_api.Models
         public int Id { get; set; }
         public string Nombres { get; set; }
         public string Apellidos { get; set; }
-        public int CentroEducativoId { get; set; }
+        public int? CentroEducativoId { get; set; }
         public string NombreCentroEducativo { get; set; }
         public DateTime FechaNacimiento { get; set; }
         public string Telefono { get; set; }
@@ -22,6 +22,7 @@ namespace haf_science_api.Models
         public string Contrasena { get; set; }
         public int RolId { get; set; }
         public string NombreRol { get; set; }
+        public bool EsSuperAdministrador { get; set; }
         public int EstadoId { get; set; }
         public int? CreadoPor { get; set; }
     }

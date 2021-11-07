@@ -22,6 +22,24 @@ namespace haf_science_api.Services
             _passwordService = passwordService;
             _logger = logger; 
         }
+        public async Task<UsuariosModel> GetUsuarioByUsernameAndPassword(string username, string password)
+        {
+            try
+            {
+                var user = (await _dbContext.UsuariosModel
+                    .FromSqlRaw("EXECUTE spGetUserDataByUsernamePassword {0}, {1}", username, password)
+                    .ToListAsync())
+                    .FirstOrDefault();
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
         public async Task<UsuariosModel> GetUsuarioLoginInfo(string username, string password)
         {
             try
@@ -33,7 +51,7 @@ namespace haf_science_api.Services
                     var byteSalt = _passwordService.ConvertStringSaltToByteArray(user.Salt);
                     var hashedPassword = _passwordService.HashPassword(password, byteSalt);
 
-                    if (user.Contrasena != hashedPassword)
+                    if (GetUsuarioByUsernameAndPassword(username, hashedPassword) == null)
                     {
                         user = null;
                         return user;
@@ -119,10 +137,10 @@ namespace haf_science_api.Services
                 user.FechaNacimiento,
                 user.Telefono,
                 user.CorreoElectronico,
-                user.NombreUsuario,
                 stringSalt,
                 hashedNewPassword,
                 user.RolId,
+                user.EsSuperAdministrador,
                 user.CentroEducativoId,
                 user.CreadoPor
                 };
@@ -518,6 +536,19 @@ namespace haf_science_api.Services
                 _logger.LogInformation(ex.ToString());
                 throw;
             }
+        }
+
+        public string GenerateUsername(string name, string lastName, DateTime birthDate)
+        {
+            return _dbContext.Usuarios.Take(1).Select(u => HafScienceDbContext.CreateUsername(name, lastName, birthDate)).SingleOrDefault(); 
+        }
+
+        public async Task<UsuariosModel> GetUsuarioByEmail(string email)
+        {
+            return (await _dbContext.UsuariosModel
+                .FromSqlRaw("EXECUTE spGetUserDataByEmail {0}", email)
+                .ToListAsync())
+                .SingleOrDefault();
         }
     }
 }

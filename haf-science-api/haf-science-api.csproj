@@ -5,6 +5,8 @@
     <RootNamespace>haf_science_api</RootNamespace>
     <UserSecretsId>7eb3518f-2c76-4dec-9da6-d0e6727e77f1</UserSecretsId>
     <StartupObject></StartupObject>
+    <ApplicationIcon />
+    <Win32Resource />
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +21,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.12.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>

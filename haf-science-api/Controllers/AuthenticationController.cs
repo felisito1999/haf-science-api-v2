@@ -30,12 +30,22 @@ namespace haf_science_api.Controllers
         {
             try
             {
-                var userExists = await _usersService.GetUsuarioByUsername(model.NombreUsuario);
+                string generatedUsername = _usersService
+                    .GenerateUsername(model.Nombres, model.Apellidos, model.FechaNacimiento);
+
+                var userExists = await _usersService.GetUsuarioByUsername(generatedUsername);
+                var emailExists = await _usersService.GetUsuarioByEmail(model.CorreoElectronico);
 
                 if (userExists != null)
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError,
-                        new Response { Status = "Error", Message = "No se pudo registrar el usuario" });
+                        new Response { Status = "Error", Message = "Ya existe un usuario con este nombre de usuario" });
+                }
+
+                if(emailExists != null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                        new Response { Status = "Error", Message = "Este correo electronico ya se encuentra registrado" });
                 }
 
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
@@ -61,31 +71,40 @@ namespace haf_science_api.Controllers
         [Route("token")]
         public async Task<ActionResult> GetToken([FromBody] LoginData requestUser)
         {
-            if (requestUser != null && requestUser.NombreUsuario != null && requestUser.Contrasena != null)
+            try
             {
-                var user = await _usersService.GetUsuarioLoginInfo(requestUser.NombreUsuario, requestUser.Contrasena);
-
-                if (user != null)
+                if (requestUser != null && requestUser.NombreUsuario != null && requestUser.Contrasena != null)
                 {
-                    var token = _tokenService.WriteToken(user);
-                    return Ok(
-                        new TokenResponse
-                        {
-                            Status = "Success",
-                            Token = token,
-                            UserInfo = _mapper.Map<UserInfo>(user)
-                        });
+                    var user = await _usersService.GetUsuarioLoginInfo(requestUser.NombreUsuario, requestUser.Contrasena);
+
+                    if (user != null)
+                    {
+                        var token = _tokenService.WriteToken(user);
+                        return Ok(
+                            new TokenResponse
+                            {
+                                Status = "Success",
+                                Token = token,
+                                UserInfo = _mapper.Map<UserInfo>(user)
+                            });
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status401Unauthorized,
+                            new Response { Status = "Unauthorized", Message = "No se pudo iniciar sesión, revise el usuario y la contraseña ingresados." });
+                    }
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status401Unauthorized,
-                        new Response { Status = "Unauthorized", Message = "No se pudo iniciar sesión, revise el usuario y la contraseña ingresados." });
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                            new Response { Status = "Error", Message = "Credenciales inválidas" });
                 }
             }
-            else
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                        new Response { Status = "Error", Message = "Credenciales inválidas" });
+                    new Response { Status = "Error", Message = ex.ToString() });
+                throw;
             }
         }
         [HttpPost]

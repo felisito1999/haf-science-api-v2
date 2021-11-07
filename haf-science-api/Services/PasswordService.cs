@@ -36,10 +36,8 @@ namespace haf_science_api.Services
 
             return salt;
         }
-
         public string HashPassword(string password, byte[] salt)
         {
-            var value = _passwordOptions.Iterations;
             string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: salt,
@@ -49,7 +47,6 @@ namespace haf_science_api.Services
 
             return hashedPassword;
         }
-
         public string CreateDefaultUserPassword(string FirstNameLetters, string LastNameLetters, DateTime Birthdate)
         {
             return FirstNameLetters.Substring(0, 2).ToUpper() + Birthdate.Month.ToString()
