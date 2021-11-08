@@ -1,4 +1,5 @@
-﻿using haf_science_api.Interfaces;
+﻿using haf_science_api.Extension_methods;
+using haf_science_api.Interfaces;
 using haf_science_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,6 +34,7 @@ namespace haf_science_api.Controllers
             {
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var roleValue = claimsIdentity.Claims.ToArray()[8].Value;
+                int? schoolId = claimsIdentity.Claims.ToArray()[9].Value.ToNullable<int>();
 
                 if (roleValue == "Administrador")
                 {
@@ -49,16 +51,16 @@ namespace haf_science_api.Controllers
                     }
                     if (!string.IsNullOrWhiteSpace(name) | centroEducativoId.HasValue | !string.IsNullOrWhiteSpace(username) | !string.IsNullOrWhiteSpace(correoElectronico) | rolId.HasValue)
                     {
-                        var users = await _userService.GetPaginatedUsersBy(page, pageSize, centroEducativoId, username, name, correoElectronico, rolId);
-                        var totalRecords = await _userService.GetPaginatedUsersCountBy(centroEducativoId, username, name, correoElectronico, rolId);
+                        var users = await _userService.GetPaginatedUsersBy(page, pageSize, centroEducativoId, username, name, correoElectronico, rolId, schoolId);
+                        var totalRecords = await _userService.GetPaginatedUsersCountBy(centroEducativoId, username, name, correoElectronico, rolId, schoolId);
 
                         return StatusCode(StatusCodes.Status200OK,
                             new PaginatedResponse<PaginatedUsuariosView> { Records = users, RecordsTotal = totalRecords });
                     }
                     else
                     {
-                        var users = await _userService.GetPaginatedUsers(page, pageSize);
-                        var totalRecords = await _userService.GetPaginatedUsersCount();
+                        var users = await _userService.GetPaginatedUsers(page, pageSize, schoolId);
+                        var totalRecords = await _userService.GetPaginatedUsersCount(schoolId);
 
                         return StatusCode(StatusCodes.Status200OK,
                             new PaginatedResponse<PaginatedUsuariosView> { Records = users, RecordsTotal = totalRecords });

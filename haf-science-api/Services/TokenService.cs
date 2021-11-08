@@ -37,6 +37,7 @@ namespace haf_science_api.Services
                         new Claim("username", user.NombreUsuario),
                         new Claim("email", user.CorreoElectronico),
                         new Claim("role", user.NombreRol),
+                        new Claim("centroEducativoId", user.CentroEducativoId.ToString()),
                     };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

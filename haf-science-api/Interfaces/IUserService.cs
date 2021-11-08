@@ -18,11 +18,12 @@ namespace haf_science_api.Interfaces
         public Task Register(T user);
         public Task Update(T dataObject);
         public Task Delete(int id);
-        public Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsers(int page, int pageSize);
-        public Task<int> GetPaginatedUsersCount();
+        public Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsers(int page, int pageSize, int? requestingUserSchoolId);
+        public Task<int> GetPaginatedUsersCount(int? requestingUserSchoolId);
         public Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsersBy(int page, int pageSize, int? centroEducativoId,
-            string username, string name, string correoElectronico, int? roldId);
-        public Task<int> GetPaginatedUsersCountBy(int? centroEducativoId, string username, string name, string correoElectronico, int? rolId);
+            string username, string name, string correoElectronico, int? roldId, int? requestingUserSchoolId);
+        public Task<int> GetPaginatedUsersCountBy(int? centroEducativoId, string username, string name, string correoElectronico, 
+            int? rolId, int? requestingUserSchoolId);
         public Task<T> GetTeacherStudentById(int teacherId, int studentId);
         public Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedTeacherStudents(int page, int pageSize, int teacherId);
         public Task<int> GetPaginatedTeacherStudentsCount(int teacherId);

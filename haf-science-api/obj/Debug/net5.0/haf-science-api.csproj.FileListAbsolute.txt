@@ -130,7 +130,6 @@ C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\staticwebassets\haf-science-api.StaticWebAssets.xml
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\scopedcss\bundle\haf-science-api.styles.css
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.RazorTargetAssemblyInfo.cache
-C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.csproj.CopyComplete
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\ref\haf-science-api.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.pdb

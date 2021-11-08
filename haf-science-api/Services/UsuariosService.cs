@@ -189,12 +189,12 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsers(int page, int pageSize)
+        public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsers(int page, int pageSize, int? requestingUserSchoolId)
         {
             try
             {
                 var users = await _dbContext.PaginatedUsuariosView
-                    .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
+                    .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}, {2}", requestingUserSchoolId, page, pageSize)
                     .ToListAsync();
 
                 return users; 
@@ -205,12 +205,12 @@ namespace haf_science_api.Services
                 throw;
             }
         }
-        public async Task<int> GetPaginatedUsersCount()
+        public async Task<int> GetPaginatedUsersCount(int? requestingUserSchoolId)
         {
             try
             {
                 var count = (await _dbContext.TotalRecordsModel
-                    .FromSqlRaw("EXECUTE spGetAllPaginatedUsersDataCount")
+                    .FromSqlRaw("EXECUTE spGetAllPaginatedUsersDataCount {0}", requestingUserSchoolId)
                     .ToListAsync()).FirstOrDefault();
 
                 return count.RecordsTotal;
@@ -223,7 +223,7 @@ namespace haf_science_api.Services
         }
 
         public async Task<IEnumerable<PaginatedUsuariosView>> GetPaginatedUsersBy(int page, int pageSize, 
-            int? centroEducativoId, string username, string name, string correoElectronico, int? rolId)
+            int? centroEducativoId, string username, string name, string correoElectronico, int? rolId, int? requestingUserSchoolId)
         {
             try
             {
@@ -299,7 +299,7 @@ namespace haf_science_api.Services
                 }
 
                 return await _dbContext.PaginatedUsuariosView
-                        .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}", page, pageSize)
+                        .FromSqlRaw("EXECUTE spGetAllPaginatedUsersData {0}, {1}, {2}", page, pageSize, requestingUserSchoolId)
                         .ToListAsync();
             }
             catch (Exception ex)
@@ -310,7 +310,7 @@ namespace haf_science_api.Services
         }
 
         public async Task<int> GetPaginatedUsersCountBy(int? centroEducativoId, string username, 
-            string name, string correoElectronico, int? rolId)
+            string name, string correoElectronico, int? rolId, int? requestingUserSchoolId)
         {
             try
             {
