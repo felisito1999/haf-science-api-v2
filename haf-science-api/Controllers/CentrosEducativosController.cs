@@ -15,10 +15,10 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class CentrosEducativosController : ControllerBase
     {
-        private readonly IDataService<CentrosEducativosModel, PaginatedCentrosEducativosView> _centrosEducativosService;
+        private readonly ICentrosEducativosService<CentrosEducativosModel, PaginatedCentrosEducativosView> _centrosEducativosService;
         private readonly ILogger _logger;
 
-        public CentrosEducativosController(IDataService<CentrosEducativosModel, PaginatedCentrosEducativosView> centrosEducativosService,
+        public CentrosEducativosController(ICentrosEducativosService<CentrosEducativosModel, PaginatedCentrosEducativosView> centrosEducativosService,
         ILogger<CentrosEducativosController> logger)
         {
             _centrosEducativosService = centrosEducativosService;
@@ -37,7 +37,12 @@ namespace haf_science_api.Controllers
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new Response()
+                {
+                    Status = "Error",
+                    Message = "Ha ocurrido un error"
+                }); ;
                 throw;
             }
         }
@@ -176,6 +181,74 @@ namespace haf_science_api.Controllers
                     Status = "Success",
                     Message = "El centro educativo fue deshabilitado satisfactoriamente"
                 });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("GetTiposCentros")]
+        public async Task<ActionResult> GetTiposCentrosEducativos()
+        {
+            try
+            {
+                var tiposCentrosEducativos = await _centrosEducativosService
+                    .GetAllTiposCentrosEducativos();
+
+                return Ok(tiposCentrosEducativos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
+        [HttpGet]
+        [Authorize]
+        [Route("GetRegionales")]
+        public async Task<ActionResult> GetRegionales()
+        {
+            try
+            {
+                var regionales = await _centrosEducativosService.GetAllRegionales();
+
+                return Ok(regionales);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
+        [HttpGet]
+        [Authorize]
+        [Route("GetDistritos")]
+        public async Task<ActionResult> GetDistritos()
+        {
+            try
+            {
+                var regionales = await _centrosEducativosService.GetAllDistritos();
+
+                return Ok(regionales);
             }
             catch (Exception ex)
             {

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace haf_science_api.Services
 {
-    public class CentrosEducativosService : IDataService<CentrosEducativosModel, PaginatedCentrosEducativosView>
+    public class CentrosEducativosService : ICentrosEducativosService<CentrosEducativosModel, PaginatedCentrosEducativosView>
     {
         private readonly HafScienceDbContext _dbContext;
         private readonly ILogger _logger;
@@ -190,6 +190,53 @@ namespace haf_science_api.Services
                 .RecordsTotal;
 
                 return totalRecords;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<TiposCentrosEducativo>> GetAllTiposCentrosEducativos()
+        {
+            try
+            {
+                var tiposCentrosEducativos = await _dbContext.TiposCentrosEducativos
+                    .ToListAsync();
+                return tiposCentrosEducativos;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<Regionale>> GetAllRegionales()
+        {
+            try
+            {
+                var regionales = await _dbContext.Regionales
+                    .ToListAsync();
+
+                return regionales; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<Distrito>> GetAllDistritos()
+        {
+            try
+            {
+                var distritos = await _dbContext.Distritos
+                    .ToListAsync();
+
+                return distritos; 
             }
             catch (Exception ex)
             {
