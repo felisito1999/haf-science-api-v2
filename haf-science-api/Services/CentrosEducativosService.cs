@@ -244,5 +244,18 @@ namespace haf_science_api.Services
                 throw;
             }
         }
+
+        public async Task<IEnumerable<Distrito>> GetDistritosByRegionalId(int regionalId)
+        {
+            try
+            {
+                return await _dbContext.Distritos.Where(x => x.RegionalId == regionalId).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
     }
 }

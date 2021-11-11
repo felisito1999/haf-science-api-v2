@@ -28,7 +28,8 @@ namespace haf_science_api.Controllers
         {
             try
             {
-                return Ok(await _provinciasService.GetAll());
+                var provincias = await _provinciasService.GetAll();
+                return Ok(provincias);
             }
             catch (Exception ex)
             {

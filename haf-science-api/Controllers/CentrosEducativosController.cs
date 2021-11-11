@@ -261,5 +261,26 @@ namespace haf_science_api.Controllers
                 throw;
             }
         }
+        [HttpGet]
+        [Authorize]
+        [Route("GetDistritosByRegionalId")]
+        public async Task<ActionResult> GetDistritosByRegionalId(int regionalId)
+        {
+            try
+            {
+                return Ok(await _centrosEducativosService.GetDistritosByRegionalId(regionalId));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new Response()
+                    {
+                        Status ="Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
     }
 }

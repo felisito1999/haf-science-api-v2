@@ -23,5 +23,6 @@ namespace haf_science_api.Interfaces
         public Task<IEnumerable<TiposCentrosEducativo>> GetAllTiposCentrosEducativos();
         public Task<IEnumerable<Regionale>> GetAllRegionales();
         public Task<IEnumerable<Distrito>> GetAllDistritos();
+        public Task<IEnumerable<Distrito>> GetDistritosByRegionalId(int regionalId);
     }
 }

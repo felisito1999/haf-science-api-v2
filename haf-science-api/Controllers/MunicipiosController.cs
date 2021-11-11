@@ -44,7 +44,7 @@ namespace haf_science_api.Controllers
             }
         }
         [Route("GetByProvinciaId")]
-        public async Task<ActionResult> GetByMunicipiosProvinciaId(int provinciaId)
+        public async Task<ActionResult> GetMunicipiosByProvinciaId(int provinciaId)
         {
             try
             {
