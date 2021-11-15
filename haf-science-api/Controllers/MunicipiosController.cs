@@ -24,6 +24,7 @@ namespace haf_science_api.Controllers
             _municipiosService = municipiosService;
             _logger = logger;
         }
+        [HttpGet]
         public async Task<ActionResult> Get()
         {
             try
@@ -43,6 +44,7 @@ namespace haf_science_api.Controllers
                 throw;
             }
         }
+        [HttpGet]
         [Route("GetByProvinciaId")]
         public async Task<ActionResult> GetMunicipiosByProvinciaId(int provinciaId)
         {

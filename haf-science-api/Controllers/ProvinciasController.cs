@@ -24,6 +24,7 @@ namespace haf_science_api.Controllers
             _provinciasService = provinciasService;
             _logger = logger; 
         }
+        [HttpGet]
         public async Task<ActionResult> Get()
         {
             try

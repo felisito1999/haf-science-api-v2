@@ -87,7 +87,8 @@ namespace haf_science_api.Controllers
             {
                 if (id.HasValue)
                 {
-                    return Ok( await _centrosEducativosService.GetById(id));
+                    var centroEducativo = await _centrosEducativosService.GetById(id);
+                    return Ok(centroEducativo);
                 }
                 else if (!string.IsNullOrWhiteSpace(name))
                 {

@@ -13,6 +13,7 @@ namespace haf_science_api.Controllers
     [Authorize]
     public class DirectoresController : ControllerBase
     {
+        [HttpGet]
         public async Task<ActionResult> Get()
         {
             return Ok();

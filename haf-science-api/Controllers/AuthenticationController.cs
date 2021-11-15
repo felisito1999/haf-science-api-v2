@@ -33,14 +33,7 @@ namespace haf_science_api.Controllers
                 string generatedUsername = _usersService
                     .GenerateUsername(model.Nombres, model.Apellidos, model.FechaNacimiento);
 
-                //var userExists = await _usersService.GetUsuarioByUsername(generatedUsername);
                 var emailExists = await _usersService.GetUsuarioByEmail(model.CorreoElectronico);
-
-                //if (userExists != null)
-                //{
-                //    return StatusCode(StatusCodes.Status500InternalServerError,
-                //        new Response { Status = "Error", Message = "Ya existe un usuario con este nombre de usuario" });
-                //}
 
                 if(emailExists != null)
                 {

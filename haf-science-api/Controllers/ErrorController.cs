@@ -10,6 +10,7 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class ErrorController : ControllerBase
     {
+        [HttpGet]
         [Route("/error")]
         public ActionResult Error() => Problem();
     }

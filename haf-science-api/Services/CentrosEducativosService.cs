@@ -60,7 +60,11 @@ namespace haf_science_api.Services
             try
             {
                 await _dbContext.Database
-                    .ExecuteSqlRawAsync("spAddSchools {0}, {1}", centroEducativo.Nombre, centroEducativo.Direccion);        
+                    .ExecuteSqlRawAsync("spAddSchools {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}", 
+                        centroEducativo.CodigoCentro, centroEducativo.Nombre, centroEducativo.Direccion,
+                        centroEducativo.RegionalId, centroEducativo.DistritoId, centroEducativo.DirectorId,
+                        centroEducativo.TipoCentroEducativoId, centroEducativo.ProvinciaId, 
+                        centroEducativo.MunicipioId);        
             }
             catch (Exception ex)
             {
@@ -68,19 +72,23 @@ namespace haf_science_api.Services
                 throw;
             }
         }
-        public Task SaveMultiple(IEnumerable<CentrosEducativosModel> dataCollection)
+        public Task SaveMultiple(IEnumerable<CentrosEducativosModel> centrosEducativosCollection)
         {
             throw new NotImplementedException();
         }
-        public async Task Update(CentrosEducativosModel dataObject)
+        public async Task Update(CentrosEducativosModel centroEducativo)
         {
             try
             {
-                if (dataObject != null)
+                if (centroEducativo != null)
                 {
-                    await _dbContext.Database.ExecuteSqlRawAsync("spUpdateSchools {0}, {1}, {2}", dataObject.Id, dataObject.Nombre, dataObject.Direccion);
-                }
-                
+                    await _dbContext.Database
+                        .ExecuteSqlRawAsync("spUpdateSchools {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}", 
+                        centroEducativo.Id, centroEducativo.CodigoCentro, centroEducativo.Nombre, 
+                        centroEducativo.Direccion, centroEducativo.RegionalId, centroEducativo.DistritoId,
+                        centroEducativo.DirectorId, centroEducativo.TipoCentroEducativoId,
+                        centroEducativo.ProvinciaId, centroEducativo.MunicipioId);
+                }                
             }
             catch (Exception ex)
             {

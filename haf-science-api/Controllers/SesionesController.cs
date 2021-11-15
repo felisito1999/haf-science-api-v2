@@ -23,6 +23,7 @@ namespace haf_science_api.Controllers
             _sessionService = sessionService;         
         }
         [Authorize]
+        [HttpGet]
         public async Task<ActionResult> Get(int page, int pageSize, int? id, int? centroEducativoId, string name)
         {
             try
@@ -134,21 +135,17 @@ namespace haf_science_api.Controllers
         {
             try
             {
-                if (session != null)
-                {
-                    var claimsIdentity = this.User.Identity as ClaimsIdentity;
-                    int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
-                    await _sessionService.Update(session, teacherId);
 
-                    return StatusCode(StatusCodes.Status200OK,
-                        new Response()
-                        {
-                            Status = "Success",
-                            Message = $"La sesión {session.SessionId} ha sido actualizada exitosamente"
-                        });
-                }
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+                await _sessionService.Update(session, teacherId);
 
-                return BadRequest();
+                return StatusCode(StatusCodes.Status200OK,
+                    new Response()
+                    {
+                        Status = "Success",
+                        Message = $"La sesión {session.SessionId} ha sido actualizada exitosamente"
+                    });
             }
             catch (Exception)
             {

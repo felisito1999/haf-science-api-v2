@@ -311,21 +311,31 @@ namespace haf_science_api.Services
         {
             try
             {
-                SessionStudentsCollection sessionStudentsCollection = new SessionStudentsCollection();
-
-                foreach(var sessionStudent in session.UsuariosSesiones)
-                {
-                    sessionStudent.SessionId = session.SessionId;
-                    sessionStudent.NombreSesion = session.Nombre;
-                    sessionStudentsCollection.Add(sessionStudent);
-                };
-
                 var usuariosSesiones = new SqlParameter("UsuariosSesiones", SqlDbType.Structured)
                 {
-                    Value = sessionStudentsCollection,
+                    Value = null,
                     TypeName = "dbo.BulkSessionStudents",
                     Direction = ParameterDirection.Input
                 };
+
+                if (session.UsuariosSesiones.Count() > 0)
+                {
+                    SessionStudentsCollection sessionStudentsCollection = new SessionStudentsCollection();
+                    
+                    foreach (var sessionStudent in session.UsuariosSesiones)
+                    {
+                        sessionStudent.SessionId = session.SessionId;
+                        sessionStudent.NombreSesion = session.Nombre;
+                        sessionStudentsCollection.Add(sessionStudent);
+                    };
+
+                    usuariosSesiones = new SqlParameter("UsuariosSesiones", SqlDbType.Structured)
+                    {
+                        Value = sessionStudentsCollection,
+                        TypeName = "dbo.BulkSessionStudents",
+                        Direction = ParameterDirection.Input
+                    };
+                }
 
                 var parameters = new object[]
                 {
