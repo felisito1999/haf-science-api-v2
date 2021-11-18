@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using haf_science_api.Interfaces;
 using haf_science_api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -15,11 +16,14 @@ namespace haf_science_api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserService<UsuariosModel> _usersService;
+        private readonly IPasswordService _passwordService;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
-        public AuthenticationController(IUserService<UsuariosModel> usersService, IMapper mapper, ITokenService tokenService)
+        public AuthenticationController(IUserService<UsuariosModel> usersService, 
+            IPasswordService passwordService, IMapper mapper, ITokenService tokenService)
         {
             _usersService = usersService;
+            _passwordService = passwordService;
             _mapper = mapper;
             _tokenService = tokenService;
         }
@@ -30,7 +34,7 @@ namespace haf_science_api.Controllers
         {
             try
             {
-                string generatedUsername = _usersService
+                string generatedUsername = await _usersService
                     .GenerateUsername(model.Nombres, model.Apellidos, model.FechaNacimiento);
 
                 var emailExists = await _usersService.GetUsuarioByEmail(model.CorreoElectronico);
@@ -101,11 +105,50 @@ namespace haf_science_api.Controllers
             }
         }
         [HttpPost]
+        [Route("check")]
+        public ActionResult CheckUserIsLoggedIn()
+        {
+            var isUserLoggedIn = this.User.Identity.IsAuthenticated;
+
+            return Ok(isUserLoggedIn);
+        }
+        [HttpPost]
         [Route("logout")]
         [Authorize]
         public ActionResult Logout()
         {
             return Ok();
+        }
+        [Route("changePassword")]
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordModel changePasswordModel)
+        {
+            try
+            {
+                var isPasswordValid = await _passwordService.ValidatePassword(changePasswordModel);
+                
+                if (isPasswordValid.Errors.Count > 0)
+                {
+                    throw new ValidationException(isPasswordValid.Errors);
+                }
+                
+                if (!changePasswordModel.Password.Equals(changePasswordModel.ConfirmPassword))
+                {
+                    throw new Exception("La contraseña y la confirmación de contraseña deben tener el mismo valor");
+                }
+                return Ok(isPasswordValid);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message
+                    });
+                throw;
+            }   
         }
         [Route("info")]
         [Authorize]
@@ -116,14 +159,6 @@ namespace haf_science_api.Controllers
             var user = _mapper.Map<UserInfo>(await _usersService.GetUsuarioById(loggedUserId));
 
             return Ok(user);
-        }
-        [HttpPost]
-        [Route("check")]
-        public ActionResult CheckUserIsLoggedIn()
-        {
-            var isUserLoggedIn = this.User.Identity.IsAuthenticated;
-
-            return Ok(isUserLoggedIn);
         }
     }
 }

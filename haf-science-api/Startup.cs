@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Text;
 using haf_science_api.Services;
 using AutoMapper;
+using FluentValidation;
 
 namespace haf_science_api
 {
@@ -58,6 +59,7 @@ namespace haf_science_api
 
             //Password services 
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<IValidator<ChangePasswordModel>, PasswordValidator>();
             services.Configure<Options.PasswordOptions>(Configuration.GetSection("PasswordOptions"));
 
             //Controllers and data services

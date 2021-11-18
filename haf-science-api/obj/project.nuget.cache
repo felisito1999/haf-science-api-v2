@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "8gCJhyr2gwVQK4FxbZJLZtqkktukP6oG2JDRwj2r0HVNXHye52E5O4B85cxD19mg0wNZw1cAUuF7VVvaywdJ3Q==",
+  "dgSpecHash": "Sy8W98B/FqsFFyirWQnadOnXzDIFoBc+nXKRj0IkgoA4giCzwKa0d518qNp9elTTzXumiCu9rz8PKCmnzwZWSA==",
   "success": true,
   "projectFilePath": "C:\\Users\\felej\\OneDrive\\Escritorio\\Proyecto tabla periódica\\haf-science-api\\haf-science-api\\haf-science-api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\felej\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\felej\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
+    "C:\\Users\\felej\\.nuget\\packages\\fluentvalidation\\10.3.4\\fluentvalidation.10.3.4.nupkg.sha512",
+    "C:\\Users\\felej\\.nuget\\packages\\fluentvalidation.aspnetcore\\10.3.4\\fluentvalidation.aspnetcore.10.3.4.nupkg.sha512",
+    "C:\\Users\\felej\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\10.3.4\\fluentvalidation.dependencyinjectionextensions.10.3.4.nupkg.sha512",
     "C:\\Users\\felej\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\felej\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\5.0.10\\microsoft.aspnetcore.authentication.jwtbearer.5.0.10.nupkg.sha512",
     "C:\\Users\\felej\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",

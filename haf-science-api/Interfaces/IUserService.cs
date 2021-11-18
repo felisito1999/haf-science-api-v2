@@ -9,7 +9,7 @@ namespace haf_science_api.Interfaces
     public interface IUserService<T>
         where T : class
     {
-        public string GenerateUsername(string name, string lastName, DateTime birthDate);
+        public Task<string> GenerateUsername(string name, string lastName, DateTime birthDate);
         public Task<T> GetUsuarioLoginInfo(string username, string password);
         public Task<T> GetUsuarioByUsernameAndPassword(string username, string password);
         public Task<T> GetUsuarioByUsername(string username);

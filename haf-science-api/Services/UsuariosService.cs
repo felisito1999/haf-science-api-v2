@@ -48,10 +48,10 @@ namespace haf_science_api.Services
 
                 if (user != null)
                 {
-                    var byteSalt = _passwordService.ConvertStringSaltToByteArray(user.Salt);
-                    var hashedPassword = _passwordService.HashPassword(password, byteSalt);
+                    var byteSalt = await _passwordService.ConvertStringSaltToByteArray(user.Salt);
+                    var hashedPassword = await _passwordService.HashPassword(password, byteSalt);
 
-                    if (GetUsuarioByUsernameAndPassword(username, hashedPassword) == null)
+                    if (await GetUsuarioByUsernameAndPassword(username, hashedPassword) == null)
                     {
                         user = null;
                         return user;
@@ -125,10 +125,10 @@ namespace haf_science_api.Services
         {
             try
             {
-                byte[] salt = _passwordService.GetSalt();
-                string stringSalt = _passwordService.ConvertSaltToString(salt);
-                string newPassword = _passwordService.CreateDefaultUserPassword(user.Nombres, user.Apellidos, user.FechaNacimiento);
-                string hashedNewPassword = _passwordService.HashPassword(newPassword, salt);
+                byte[] salt = await _passwordService.GetSalt();
+                string stringSalt = await _passwordService.ConvertSaltToString(salt);
+                string newPassword = await _passwordService.CreateDefaultUserPassword(user.Nombres, user.Apellidos, user.FechaNacimiento);
+                string hashedNewPassword = await _passwordService.HashPassword(newPassword, salt);
 
                 var parameters = new object[]
                 {
@@ -538,9 +538,15 @@ namespace haf_science_api.Services
             }
         }
 
-        public string GenerateUsername(string name, string lastName, DateTime birthDate)
+        public async Task<string> GenerateUsername(string name, string lastName, DateTime birthDate)
         {
-            return _dbContext.Usuarios.Take(1).Select(u => HafScienceDbContext.CreateUsername(name, lastName, birthDate)).SingleOrDefault(); 
+            var username = (await _dbContext.Usuarios
+                .Take(1)
+                .Select(u => HafScienceDbContext.CreateUsername(name, lastName, birthDate))
+                .ToListAsync())
+                .FirstOrDefault();
+
+            return username; 
         }
 
         public async Task<UsuariosModel> GetUsuarioByEmail(string email)
