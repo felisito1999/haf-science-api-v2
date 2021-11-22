@@ -15,6 +15,10 @@ namespace haf_science_api.Interfaces
         public Task<T> GetUsuarioByUsername(string username);
         public Task<T> GetUsuarioByEmail(string email);
         public Task<T> GetUsuarioById(int id);
+        public Task<bool> EmailExistsAsync(string email);
+        public Task<string> GenerateUserHashes(int userId);
+        public Task SaveUserHash(int userId, string hash);
+        public Task<bool> VerifyUserHash(int userId);
         public Task Register(T user);
         public Task Update(T dataObject);
         public Task Delete(int id);

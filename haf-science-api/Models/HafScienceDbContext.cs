@@ -36,6 +36,7 @@ namespace haf_science_api.Models
         public virtual DbSet<TiposEstado> TiposEstados { get; set; }
         public virtual DbSet<TiposInsignia> TiposInsignias { get; set; }
         public virtual DbSet<TiposLog> TiposLogs { get; set; }
+        public virtual DbSet<UserHash> UserHashes { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<UsuariosDetalle> UsuariosDetalles { get; set; }
         public virtual DbSet<UsuariosInsignia> UsuariosInsignias { get; set; }
@@ -57,7 +58,6 @@ namespace haf_science_api.Models
         {
             throw new NotImplementedException();
         }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             Console.WriteLine("Arreglar la conexión a la base de datos");
@@ -82,6 +82,9 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<CentrosEducativo>(entity =>
             {
+                entity.HasIndex(e => e.CodigoCentro, "UQ_CodigoCentro")
+                    .IsUnique();
+
                 entity.Property(e => e.CodigoCentro)
                     .IsRequired()
                     .HasMaxLength(5)
@@ -151,7 +154,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Directore>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3CFA28235")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3D131B89F")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -177,7 +180,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Distrito>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFA97DE38D")
+                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFE6406308")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -450,7 +453,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Regionale>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF67C977EB")
+                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF9F809BDE")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -504,7 +507,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Sesione>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Sesiones__75E3EFCF036F76C2")
+                entity.HasIndex(e => e.Nombre, "UQ__Sesiones__75E3EFCFB77405F6")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -542,7 +545,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<TiposCentrosEducativo>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFC6E46F42")
+                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCF9EEB3E2B")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -585,12 +588,31 @@ namespace haf_science_api.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<UserHash>(entity =>
+            {
+                entity.Property(e => e.FechaCreacion)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
+
+                entity.Property(e => e.FechaExpiracion).HasColumnType("datetime");
+
+                entity.Property(e => e.Hash)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserHashes)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserHashes_Usuarios");
+            });
+
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC328D1BE6")
+                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC3EDC9782")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE0D7DC4F18")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE0372A6050")
                     .IsUnique();
 
                 entity.Property(e => e.Codigo)
@@ -641,7 +663,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F386223F20")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F30328C8A9")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)

@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using haf_science_api.Interfaces;
 using haf_science_api.Models;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace haf_science_api.Services
@@ -27,7 +29,7 @@ namespace haf_science_api.Services
             try
             {
                 var user = (await _dbContext.UsuariosModel
-                    .FromSqlRaw("EXECUTE spGetUserDataByUsernamePassword {0}, {1}", username, password)
+                    .FromSqlRaw("EXECUTE spGetUserByUsernamePassword {0}, {1}", username, password)
                     .ToListAsync())
                     .FirstOrDefault();
 
@@ -51,7 +53,8 @@ namespace haf_science_api.Services
                     var byteSalt = await _passwordService.ConvertStringSaltToByteArray(user.Salt);
                     var hashedPassword = await _passwordService.HashPassword(password, byteSalt);
 
-                    if (await GetUsuarioByUsernameAndPassword(username, hashedPassword) == null)
+                    var userByUsernameAndPassword = await GetUsuarioByUsernameAndPassword(username, hashedPassword);
+                    if (userByUsernameAndPassword == null)
                     {
                         user = null;
                         return user;
@@ -89,6 +92,7 @@ namespace haf_science_api.Services
                     user.Id,
                     user.Nombres,
                     user.Apellidos,
+                    user.Contrasena,
                     user.FechaNacimiento,
                     user.Telefono,
                     user.CorreoElectronico,
@@ -99,7 +103,7 @@ namespace haf_science_api.Services
                 };
 
                 await _dbContext.Database
-                    .ExecuteSqlRawAsync("spUpdateUserData {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}",
+                    .ExecuteSqlRawAsync("spUpdateUserData {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}",
                     parameters);
             }
             catch (Exception ex)
@@ -555,6 +559,85 @@ namespace haf_science_api.Services
                 .FromSqlRaw("EXECUTE spGetUserDataByEmail {0}", email)
                 .ToListAsync())
                 .SingleOrDefault();
+        }
+        public async Task<string> GenerateUserHashes(int userId)
+        {
+            try
+            {
+                byte[] bytes;
+                string base64Url = await Task.Run(() =>
+                {
+                    RandomNumberGenerator rng = RandomNumberGenerator.Create();
+                    bytes = new byte[12];
+                    rng.GetBytes(bytes);
+                    return Convert.ToBase64String(bytes)
+                    .Replace('+', '-')
+                    .Replace('/', '_');
+                });
+
+                return base64Url;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task SaveUserHash(int userId, string hash)
+        {
+            try
+            {
+                UserHash hashObject = new UserHash()
+                {
+                    UserId = userId,
+                    Hash = hash,
+                    FechaExpiracion = DateTime.Now.ToUniversalTime().AddMinutes(30)
+                };
+                await _dbContext.UserHashes.AddAsync(hashObject);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<bool> VerifyUserHash(int userId)
+        {
+            var userHash = await _dbContext.UserHashes
+                .Where(x => x.UserId == userId && x.FechaExpiracion >= DateTime.UtcNow)
+                .FirstOrDefaultAsync();
+
+            if (userHash == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            try
+            {
+                var mail = await _dbContext.UsuariosDetalles
+                    .Where(x => x.CorreoElectronico == email)
+                    .FirstOrDefaultAsync();   
+
+                if (mail == null)
+                {
+                    return false;
+                }
+
+                return true; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
         }
     }
 }

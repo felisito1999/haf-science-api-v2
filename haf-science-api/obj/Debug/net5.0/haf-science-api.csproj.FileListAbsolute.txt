@@ -138,3 +138,12 @@ C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.pdb
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.genruntimeconfig.cache
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.csproj.AssemblyReference.cache
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\MailKit.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\MimeKit.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\NETCore.MailKit.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\BouncyCastle.Crypto.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\EmailService.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\EmailService.pdb
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\Microsoft.AspNetCore.Http.Features.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\Microsoft.Extensions.Primitives.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\System.IO.Pipelines.dll

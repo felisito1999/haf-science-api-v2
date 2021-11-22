@@ -1,0 +1,5 @@
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api.Data\obj\Debug\net5.0\haf-science-api.Data.csproj.AssemblyReference.cache
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api.Data\obj\Debug\net5.0\haf-science-api.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api.Data\obj\Debug\net5.0\haf-science-api.Data.AssemblyInfoInputs.cache
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api.Data\obj\Debug\net5.0\haf-science-api.Data.AssemblyInfo.cs
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api.Data\obj\Debug\net5.0\haf-science-api.Data.csproj.CoreCompileInputs.cache

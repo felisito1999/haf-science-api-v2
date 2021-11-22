@@ -20,6 +20,12 @@ using System.Text;
 using haf_science_api.Services;
 using AutoMapper;
 using FluentValidation;
+using EmailService;
+using EmailService.Models;
+using EmailService.Services;
+using EmailService.Interfaces;
+using Microsoft.AspNetCore.Http.Features;
+using haf_science_api.Options;
 
 namespace haf_science_api
 {
@@ -36,11 +42,17 @@ namespace haf_science_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
             //Database services
             var connection = Configuration.GetConnectionString("HafScienceDatabase");
             
             services.AddDbContextPool<HafScienceDbContext>(
                 options => options.UseSqlServer(connection));
+
+            //FrontEndInfoConfig
+            var frontEndAppConfig = Configuration.GetSection("FrontEndHafAppInfo")
+                .Get<FrontEndHafAppInfo>();
+            services.AddSingleton(frontEndAppConfig);
 
             //Authentication services
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -57,6 +69,18 @@ namespace haf_science_api
                 };
             });
 
+            //Email services
+            var emailConfig = Configuration.GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            services.Configure<FormOptions>(opt =>
+            {
+                opt.ValueLengthLimit = int.MaxValue;
+                opt.MultipartBodyLengthLimit = int.MaxValue;
+                opt.MemoryBufferThreshold = int.MaxValue;
+            });
+            services.AddSingleton(emailConfig);
+            services.AddScoped<IEmailSender, EmailSenderService>();
+
             //Password services 
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<IValidator<ChangePasswordModel>, PasswordValidator>();
@@ -68,6 +92,7 @@ namespace haf_science_api
             services.AddScoped<ISessionService<SesionesModel, PaginatedSesionesView>, SesionesService>();
             services.AddScoped<IProvinciasService<Provincia>, ProvinciasService>();
             services.AddScoped<IMunicipiosService<Municipio>, MunicipiosService>();
+            services.AddScoped<IUserHashesService<UserHash>, UsersHashesService>();
             services.AddScoped<IDataService<Role, RolView>, RolesService>();
 
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
