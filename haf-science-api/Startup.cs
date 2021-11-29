@@ -94,6 +94,8 @@ namespace haf_science_api
             services.AddScoped<IMunicipiosService<Municipio>, MunicipiosService>();
             services.AddScoped<IUserHashesService<UserHash>, UsersHashesService>();
             services.AddScoped<IDataService<Role, RolView>, RolesService>();
+            services.AddScoped<IPruebasDiagnosticasService<PruebasDiagnostica>, PruebasDiagnosticasService>();
+            services.AddScoped<IPreguntasService<Pregunta>, PreguntasService>();
 
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
             //services.AddScoped<IDataService<Estado>, EstadosService>();

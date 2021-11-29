@@ -76,7 +76,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
-                    .HasMaxLength(1)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
@@ -154,7 +154,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Directore>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3D131B89F")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3C4739B17")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -180,7 +180,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Distrito>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFE6406308")
+                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFE03C3A0F")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -331,8 +331,6 @@ namespace haf_science_api.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Valoracion).HasColumnType("decimal(1, 1)");
-
                 entity.HasOne(d => d.CategoriaPregunta)
                     .WithMany(p => p.Pregunta)
                     .HasForeignKey(d => d.CategoriaPreguntaId)
@@ -363,13 +361,11 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<PruebasDiagnostica>(entity =>
             {
+                entity.Property(e => e.CalificacionMaxima).HasColumnType("decimal(4, 1)");
+
                 entity.Property(e => e.FechaCreacion)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getutcdate())");
-
-                entity.Property(e => e.FechaInicio).HasColumnType("datetime");
-
-                entity.Property(e => e.FechaLimite).HasColumnType("datetime");
 
                 entity.Property(e => e.Titulo)
                     .IsRequired()
@@ -393,6 +389,8 @@ namespace haf_science_api.Models
             {
                 entity.HasKey(e => new { e.PreguntaId, e.PruebaId });
 
+                entity.Property(e => e.CalificacionMaximaPrueba).HasColumnType("decimal(4, 1)");
+
                 entity.Property(e => e.FechaCreacion)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getutcdate())");
@@ -406,6 +404,8 @@ namespace haf_science_api.Models
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Valoracion).HasColumnType("decimal(4, 1)");
 
                 entity.HasOne(d => d.Pregunta)
                     .WithMany(p => p.PruebasPregunta)
@@ -427,6 +427,10 @@ namespace haf_science_api.Models
                 entity.Property(e => e.FechaCreacion)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getutcdate())");
+
+                entity.Property(e => e.FechaInicio).HasColumnType("datetime");
+
+                entity.Property(e => e.FechaLimite).HasColumnType("datetime");
 
                 entity.Property(e => e.NombreSesion)
                     .IsRequired()
@@ -453,7 +457,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Regionale>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF9F809BDE")
+                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCFC038E8F4")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -466,7 +470,7 @@ namespace haf_science_api.Models
             {
                 entity.Property(e => e.Contenido)
                     .IsRequired()
-                    .HasMaxLength(140)
+                    .HasMaxLength(255)
                     .IsUnicode(false);
 
                 entity.Property(e => e.FechaCreacion)
@@ -507,7 +511,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Sesione>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Sesiones__75E3EFCFB77405F6")
+                entity.HasIndex(e => e.Nombre, "UQ__Sesiones__75E3EFCFEA20D1FF")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -545,7 +549,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<TiposCentrosEducativo>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCF9EEB3E2B")
+                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFB6448F6F")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -609,10 +613,10 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC3EDC9782")
+                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC93313057")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE0372A6050")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE067F23946")
                     .IsUnique();
 
                 entity.Property(e => e.Codigo)
@@ -632,6 +636,10 @@ namespace haf_science_api.Models
                     .IsRequired()
                     .HasMaxLength(30)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PasswordChangeRequired)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Salt)
                     .IsRequired()
@@ -663,7 +671,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F30328C8A9")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F311880D5D")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)

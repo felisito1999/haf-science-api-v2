@@ -15,9 +15,7 @@ namespace haf_science_api.Models
 
         public int Id { get; set; }
         public string Titulo { get; set; }
-        public int CalificacionMaxima { get; set; }
-        public DateTime FechaInicio { get; set; }
-        public DateTime FechaLimite { get; set; }
+        public decimal CalificacionMaxima { get; set; }
         public int EstadoId { get; set; }
         public int CreadoPor { get; set; }
         public DateTime FechaCreacion { get; set; }

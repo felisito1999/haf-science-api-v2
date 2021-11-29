@@ -31,6 +31,7 @@ namespace haf_science_api.Models
         public int UsuarioDetalleId { get; set; }
         public int EstadoId { get; set; }
         public bool EsSuperAdministrador { get; set; }
+        public bool? PasswordChangeRequired { get; set; }
         public int? CreadoPor { get; set; }
         public DateTime FechaCreacion { get; set; }
         public bool Eliminado { get; set; }

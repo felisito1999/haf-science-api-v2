@@ -15,7 +15,6 @@ namespace haf_science_api.Models
 
         public int Id { get; set; }
         public string Titulo { get; set; }
-        public decimal? Valoracion { get; set; }
         public int CategoriaPreguntaId { get; set; }
         public int EstadoId { get; set; }
         public int CreadoPor { get; set; }

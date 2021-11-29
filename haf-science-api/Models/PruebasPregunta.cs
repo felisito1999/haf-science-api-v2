@@ -9,6 +9,8 @@ namespace haf_science_api.Models
     {
         public int PreguntaId { get; set; }
         public int PruebaId { get; set; }
+        public decimal CalificacionMaximaPrueba { get; set; }
+        public decimal Valoracion { get; set; }
         public string TituloPregunta { get; set; }
         public string TituloPrueba { get; set; }
         public DateTime FechaCreacion { get; set; }
