@@ -51,14 +51,15 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task<IEnumerable<PruebasDiagnostica>> GetPaginatedPruebasDiagnosticasBySessionId(int sessionId, int page, int pageSize)
+        public async Task<IEnumerable<object>> GetPaginatedPruebasDiagnosticasBySessionId(int sessionId, int page, int pageSize)
         {
             try
             {
                 //Falta agregar la parte de que se presenten las sesiones que pertenecen a una sesión.
                 int skip = (page - 1) * pageSize;
                 var pruebasDiagnosticas = await _dbContext.PruebasDiagnosticas
-                    .Where(x => x.Eliminado == false)
+                    .Select(prueba => new { prueba.Id, prueba.Titulo, SesionId = prueba.PruebasSesiones.Select(sesion => sesion.SesionId).SingleOrDefault(), prueba.Eliminado})
+                    .Where(prueba => prueba.Eliminado == false && prueba.SesionId == sessionId)
                     .Skip(skip).Take(pageSize).ToListAsync();
 
                 return pruebasDiagnosticas;

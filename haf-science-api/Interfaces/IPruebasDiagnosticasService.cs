@@ -10,7 +10,7 @@ namespace haf_science_api.Interfaces
         Task AssignToSession(AssignTestToSessionModel assignToSessionModel, int teacherId);
         Task<IEnumerable<T>> GetTeacherPaginatedPruebasDiagnosticas(int teacherId, int page, int pageSize);
         Task<int> GetTeacherPaginatedPruebasDiagnosticasCount(int teacherId);
-        Task<IEnumerable<T>> GetPaginatedPruebasDiagnosticasBySessionId(int sessionId, int page, int pageSize);
+        Task<IEnumerable<object>> GetPaginatedPruebasDiagnosticasBySessionId(int sessionId, int page, int pageSize);
         Task<int> GetPaginatedPruebasDiagnosticasBySessionIdCount(int sessionId);
         Task SavePruebaDiagnostica(PruebasDiagnosticasModel pruebaDiagnostica, int teacherId);
     }

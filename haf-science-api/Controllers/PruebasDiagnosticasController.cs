@@ -48,6 +48,34 @@ namespace haf_science_api.Controllers
                 throw;
             }        
         }
+        [Route("session-pruebas-diagnosticas")]
+        [HttpGet]
+        public async Task<ActionResult> GetSessionPruebasDiagnosticas(int page, int pageSize, int sessionId)
+        {
+            try
+            {
+                var pruebasDiagnosticas = await _pruebasDiagnosticasService
+                    .GetPaginatedPruebasDiagnosticasBySessionId(sessionId, page, pageSize);
+                var pruebasDiagnosticasCount = await _pruebasDiagnosticasService
+                    .GetPaginatedPruebasDiagnosticasBySessionIdCount(sessionId);
+
+                return Ok(new PaginatedResponse<object>()
+                {
+                    Records = pruebasDiagnosticas,
+                    RecordsTotal = pruebasDiagnosticasCount
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message
+                    });
+                throw;
+            }
+        }
         [Route("save-prueba-diagnostica")]
         [HttpPost]
         [Authorize(Roles = "Docente")]
