@@ -24,6 +24,15 @@ namespace haf_science_api.Services
         {
             try
             {
+                var relationshipExists = await _dbContext.PruebasSesiones
+                    .Where(pruebaSesion => pruebaSesion.PruebaDiagnosticaId == model.PruebaDiagnosticaId && 
+                    pruebaSesion.SesionId == model.SessionId).AnyAsync();
+
+                if (relationshipExists)
+                {
+                    throw new Exception("Esta prueba ya se encuentra relacionada con esta sesión");
+                }
+
                 var prueba = await _dbContext.PruebasDiagnosticas
                     .Where(prueba => prueba.Id == model.PruebaDiagnosticaId)
                     .FirstOrDefaultAsync();
@@ -38,6 +47,8 @@ namespace haf_science_api.Services
                     SesionId = model.SessionId,
                     TituloPrueba = prueba.Titulo,
                     NombreSesion = session.Nombre,
+                    DuracionMinutos = model.DuracionMinutos,
+                    CantidadIntentos = model.CantidadIntentos,
                     FechaInicio = model.FechaInicio,
                     FechaLimite = model.FechaLimite,
                 };
@@ -57,9 +68,15 @@ namespace haf_science_api.Services
             {
                 //Falta agregar la parte de que se presenten las sesiones que pertenecen a una sesión.
                 int skip = (page - 1) * pageSize;
+
                 var pruebasDiagnosticas = await _dbContext.PruebasDiagnosticas
-                    .Select(prueba => new { prueba.Id, prueba.Titulo, SesionId = prueba.PruebasSesiones.Select(sesion => sesion.SesionId).SingleOrDefault(), prueba.Eliminado})
-                    .Where(prueba => prueba.Eliminado == false && prueba.SesionId == sessionId)
+                    .Select(prueba => new { prueba.Id, prueba.Titulo,
+                        PruebaSesion = prueba.PruebasSesiones.Select(pruebaSesion => new { pruebaSesion.SesionId, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.DuracionMinutos, pruebaSesion.Eliminado }).Where(pruebaSesion => pruebaSesion.SesionId == sessionId).SingleOrDefault(),
+                        prueba.Eliminado })
+                    .Where(prueba => prueba.Eliminado == false && 
+                        prueba.PruebaSesion.SesionId == sessionId && 
+                        prueba.PruebaSesion.Eliminado == false)
+                    .OrderByDescending(prueba => prueba.PruebaSesion.FechaInicio)
                     .Skip(skip).Take(pageSize).ToListAsync();
 
                 return pruebasDiagnosticas;
@@ -76,7 +93,16 @@ namespace haf_science_api.Services
             try
             {
                 int pruebaDiagnosticasCount = await _dbContext.PruebasDiagnosticas
-                    .Where(x => x.Eliminado == false)
+                    .Select(prueba => new {
+                        prueba.Id,
+                        prueba.Titulo,
+                        PruebaSesion = prueba.PruebasSesiones
+                        .Select(pruebaSesion => new { pruebaSesion.SesionId, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.DuracionMinutos, pruebaSesion.Eliminado }).Where( pruebaSesion => pruebaSesion.SesionId == sessionId).SingleOrDefault(),
+                        prueba.Eliminado
+                    })
+                    .Where(prueba => prueba.Eliminado == false &&
+                        prueba.PruebaSesion.SesionId == sessionId &&
+                        prueba.PruebaSesion.Eliminado == false)
                     .CountAsync();
 
                 return pruebaDiagnosticasCount;
@@ -115,6 +141,29 @@ namespace haf_science_api.Services
                     .CountAsync();
 
                 return pruebasCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<bool> isAvailableForStudent(int studentId, int pruebaDiagnosticaId)
+        {
+            try
+            {
+                var pruebaInfo = await _dbContext.PruebasDiagnosticas
+                    .Select(pruebaDiagnostica => new { pruebaDiagnostica.Id, PruebasSesiones = pruebaDiagnostica.PruebasSesiones.Where(pruebaSesion => pruebaSesion.Eliminado == false) })
+                    .Where(pruebaDiagnostica => pruebaDiagnostica.Id == pruebaDiagnosticaId)
+                    .SingleOrDefaultAsync();
+
+                if (pruebaInfo == null)
+                {
+                    return false;
+                }
+
+                bool isAssignedToSession
             }
             catch (Exception ex)
             {

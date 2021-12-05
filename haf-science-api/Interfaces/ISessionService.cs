@@ -12,6 +12,7 @@ namespace haf_science_api.Interfaces
     {
         Task<T> GetById(int id);
         Task<T> GetTeacherSessionsById(int id, int teacherId);
+        Task<object> GetStudentSessionById(int id, int studentId);
         Task Save(SessionSaveUpdateModel session, int userId);
         Task Update(SessionSaveUpdateModel session, int userId);
         Task Delete(int id);
@@ -25,7 +26,7 @@ namespace haf_science_api.Interfaces
         public Task<IEnumerable<TPaginatedView>> GetPaginatedTeacherSessionsDataBy(int page, int pageSize,
              int? teacherId, string name);
         public Task<int> GetPaginatedTeacherSessionsCountBy(int teacherId, string name);
-        public Task<IEnumerable<TPaginatedView>> GetPaginatedStudentSessionsDataBy(int page, int pageSize,
+        public Task<IEnumerable<object>> GetPaginatedStudentSessionsDataBy(int page, int pageSize,
              int studentId);
         public Task<int> GetPaginatedStudentSessionsCountBy(int studentId);
     }

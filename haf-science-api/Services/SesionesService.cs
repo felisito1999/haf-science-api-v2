@@ -187,14 +187,40 @@ namespace haf_science_api.Services
             }
         }
 
-        public Task<int> GetPaginatedStudentSessionsCountBy(int studentId)
+        public async Task<int> GetPaginatedStudentSessionsCountBy(int studentId)
         {
-            throw new NotImplementedException();
+            int sesionesCount = await _dbContext.Sesiones
+                .Select(sesion => new {
+                    sesion.Id,
+                    sesion.Nombre,
+                    sesion.Descripcion,
+                    NombreCentroEducativo = sesion.CentroEducativo.Nombre,
+                    UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).SingleOrDefault(),
+                    sesion.FechaCreacion,
+                    sesion.Eliminado
+                })
+                .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
+                sesion.UsuariosSesiones.Eliminado == false)
+                .CountAsync();
+
+            return sesionesCount;
         }
 
-        public Task<IEnumerable<PaginatedSesionesView>> GetPaginatedStudentSessionsDataBy(int page, int pageSize, int studentId)
+        public async Task<IEnumerable<object>> GetPaginatedStudentSessionsDataBy(int page, int pageSize, int studentId)
         {
-            throw new NotImplementedException();
+            int skip = (page - 1) * pageSize;
+
+            var sesiones = await _dbContext.Sesiones
+                .Select(sesion => new { sesion.Id, sesion.Nombre, sesion.Descripcion, NombreCentroEducativo = sesion.CentroEducativo.Nombre,
+                    UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).Where(usuarioSesion => usuarioSesion.UsuarioId == studentId).SingleOrDefault(),
+                    sesion.FechaCreacion, sesion.Eliminado })
+                                .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
+                sesion.UsuariosSesiones.Eliminado == false)
+                .OrderByDescending(sesion => sesion.FechaCreacion)
+                .Skip(skip).Take(pageSize)
+                .ToListAsync();
+
+            return sesiones;
         }
 
         public async Task<IEnumerable<PaginatedSesionesView>> GetPaginatedTeacherSessions(int page, int pageSize, int teacherId)
@@ -369,6 +395,34 @@ namespace haf_science_api.Services
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public async Task<object> GetStudentSessionById(int id, int studentId)
+        {
+            try
+            {
+                var session = await _dbContext.Sesiones
+                    .Select(sesion => new
+                    {
+                        sesion.Id,
+                        sesion.Nombre,
+                        sesion.Descripcion,
+                        NombreCentroEducativo = sesion.CentroEducativo.Nombre,
+                        UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).Where(usuarioSesion => usuarioSesion.UsuarioId == studentId).SingleOrDefault(),
+                        sesion.FechaCreacion,
+                        sesion.Eliminado
+                    })
+                .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
+                sesion.UsuariosSesiones.Eliminado == false)
+                .SingleOrDefaultAsync();
+
+                return session;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
                 throw;
             }
         }

@@ -26,7 +26,7 @@ namespace haf_science_api.Controllers
             _logger = logger; 
         }
         [HttpGet]
-        [Authorize(Roles = "Administrador,Docente")]
+        [Authorize]
         public async Task<ActionResult> Get([FromQuery]int page, [FromQuery]int pageSize, int? id, int? centroEducativoId, 
             string username, string name, string correoElectronico, int? rolId, int? sessionId)
         {
@@ -112,6 +112,15 @@ namespace haf_science_api.Controllers
                 }
                 else
                 {
+                    if (sessionId.HasValue)
+                    {
+                        var users = await _userService.GetSessionStudents(page, pageSize, (int)sessionId);
+                        var totalRecords = await _userService.GetSessionStudentsCount((int)sessionId);
+
+                        return StatusCode(StatusCodes.Status200OK,
+                            new PaginatedResponse<object> { Records = users, RecordsTotal = totalRecords });
+                    }
+
                     return StatusCode(StatusCodes.Status403Forbidden,
                         new Response()
                         {

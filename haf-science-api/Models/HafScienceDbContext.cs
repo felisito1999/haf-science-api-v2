@@ -38,6 +38,7 @@ namespace haf_science_api.Models
         public virtual DbSet<TiposLog> TiposLogs { get; set; }
         public virtual DbSet<UserHash> UserHashes { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
+        public virtual DbSet<UsuarioRealizaPrueba> UsuarioRealizaPruebas { get; set; }
         public virtual DbSet<UsuariosDetalle> UsuariosDetalles { get; set; }
         public virtual DbSet<UsuariosInsignia> UsuariosInsignias { get; set; }
         public virtual DbSet<UsuariosLog> UsuariosLogs { get; set; }
@@ -97,7 +98,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Director)
@@ -154,7 +155,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Directore>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3C4739B17")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F37DC69273")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -180,7 +181,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Distrito>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFE03C3A0F")
+                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFA428509D")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -260,7 +261,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.NombreJuego)
                     .IsRequired()
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.RecompensaJuego)
@@ -369,7 +370,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.Titulo)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.CreadoPorNavigation)
@@ -402,7 +403,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.TituloPrueba)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Valoracion).HasColumnType("decimal(4, 1)");
@@ -434,12 +435,12 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.NombreSesion)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.TituloPrueba)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.PruebaDiagnostica)
@@ -457,7 +458,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Regionale>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCFC038E8F4")
+                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF89CE3828")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -511,9 +512,6 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Sesione>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Sesiones__75E3EFCFEA20D1FF")
-                    .IsUnique();
-
                 entity.Property(e => e.Descripcion)
                     .IsRequired()
                     .HasMaxLength(250)
@@ -525,7 +523,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.CentroEducativo)
@@ -549,7 +547,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<TiposCentrosEducativo>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFB6448F6F")
+                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFA1706CD9")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -613,10 +611,10 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC93313057")
+                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DACB63A0D5C")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE067F23946")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE05823BAA5")
                     .IsUnique();
 
                 entity.Property(e => e.Codigo)
@@ -634,7 +632,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.NombreUsuario)
                     .IsRequired()
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PasswordChangeRequired)
@@ -669,9 +667,50 @@ namespace haf_science_api.Models
                     .HasConstraintName("FK_DetalleUsuarios_Usuarios");
             });
 
+            modelBuilder.Entity<UsuarioRealizaPrueba>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("UsuarioRealizaPrueba");
+
+                entity.Property(e => e.Calificación).HasColumnType("decimal(4, 1)");
+
+                entity.Property(e => e.FechaCreacion)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
+
+                entity.Property(e => e.NombreUsuario)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TituloPrueba)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.PruebaDiagnostica)
+                    .WithMany()
+                    .HasForeignKey(d => d.PruebaDiagnosticaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PruebasDiagnosticas_UsuarioRealizaPrueba");
+
+                entity.HasOne(d => d.Session)
+                    .WithMany()
+                    .HasForeignKey(d => d.SessionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Sesiones_UsuarioRealizaPrueba");
+
+                entity.HasOne(d => d.Usuario)
+                    .WithMany()
+                    .HasForeignKey(d => d.UsuarioId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Usuarios_UsuarioRealizaPrueba");
+            });
+
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F311880D5D")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F32DB259BE")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -715,7 +754,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.NombreUsuario)
                     .IsRequired()
-                    .HasMaxLength(20)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.AsignadoPorNavigation)
@@ -762,12 +801,12 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.NombreSesion)
                     .IsRequired()
-                    .HasMaxLength(50)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.NombreUsuario)
                     .IsRequired()
-                    .HasMaxLength(20)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Sesion)

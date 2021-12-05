@@ -127,7 +127,7 @@ namespace haf_science_api
             app.UseCors(
                 options =>
                 {
-                    options.WithOrigins("http://localhost:3000", "http://10.0.0.6:3000");
+                    options.WithOrigins("http://localhost:3000", "http://10.0.0.6:3000", "https://haf-science-app-gxj3q.ondigitalocean.app");
                     options.AllowAnyMethod();
                     options.AllowAnyHeader();
                 });

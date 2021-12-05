@@ -2,7 +2,6 @@ C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\Ema
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\bin\Debug\net5.0\EmailService.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\bin\Debug\net5.0\ref\EmailService.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\bin\Debug\net5.0\EmailService.pdb
-C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.csproj.AssemblyReference.cache
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.AssemblyInfoInputs.cache
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.AssemblyInfo.cs
@@ -10,3 +9,4 @@ C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\Ema
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\ref\EmailService.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.pdb
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\EmailService\obj\Debug\net5.0\EmailService.csproj.AssemblyReference.cache

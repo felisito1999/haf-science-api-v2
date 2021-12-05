@@ -639,5 +639,46 @@ namespace haf_science_api.Services
                 throw;
             }
         }
+
+        public async Task<IEnumerable<object>> GetSessionStudents(int page, int pageSize, int sessionId)
+        {
+            try
+            {
+                int skip = (page - 1) * pageSize;
+
+                var students = await _dbContext.Usuarios
+                    .Select(student => new { student.Codigo, student.NombreUsuario, student.UsuarioDetalle.Nombres, student.UsuarioDetalle.Apellidos, student.Eliminado,
+                    UsuariosSesiones = student.UsuariosSesiones.Where(session => session.SesionId == sessionId)})
+                    .Where(student => student.Eliminado == false && student.UsuariosSesiones.Any())
+                    .OrderByDescending(student => student.Codigo)
+                    .Skip(skip).Take(pageSize)
+                    .ToListAsync();
+
+                return students;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<int> GetSessionStudentsCount(int sessionId)
+        {
+            var studentCount = await _dbContext.Usuarios
+                    .Select(student => new {
+                        student.Codigo,
+                        student.NombreUsuario,
+                        student.UsuarioDetalle.Nombres,
+                        student.UsuarioDetalle.Apellidos,
+                        student.Eliminado,
+                        UsuariosSesiones = student.UsuariosSesiones.Where(session => session.SesionId == sessionId)
+                    })
+                    .Where(student => student.Eliminado == false && student.UsuariosSesiones.Any())
+                    .OrderByDescending(student => student.Codigo)
+                    .CountAsync();
+
+            return studentCount;
+        }
     }
 }

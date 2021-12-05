@@ -14,8 +14,8 @@ namespace haf_science_api.Controllers
     [ApiController]
     public class PruebasDiagnosticasController : ControllerBase
     {
-        private readonly IPruebasDiagnosticasService<PruebasDiagnostica> _pruebasDiagnosticasService;   
-        
+        private readonly IPruebasDiagnosticasService<PruebasDiagnostica> _pruebasDiagnosticasService;
+
         public PruebasDiagnosticasController(IPruebasDiagnosticasService<PruebasDiagnostica> pruebasDiagnosticasService)
         {
             _pruebasDiagnosticasService = pruebasDiagnosticasService;
@@ -46,7 +46,7 @@ namespace haf_science_api.Controllers
             {
 
                 throw;
-            }        
+            }
         }
         [Route("session-pruebas-diagnosticas")]
         [HttpGet]
@@ -101,7 +101,7 @@ namespace haf_science_api.Controllers
                     });
                 throw;
             }
-        
+
         }
         [Route("assign-to-session")]
         [HttpPost]
@@ -125,6 +125,24 @@ namespace haf_science_api.Controllers
                         Status = "Error",
                         Message = ex.Message.ToString()
                     });
+                throw;
+            }
+        }
+        [Route("get-attempt")]
+        [HttpGet]
+        [Authorize(Roles = "Estudiante")]
+        public async Task<ActionResult> GetAttempt(int pruebaDiagnosticaId)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int studentId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                bool isAvailableForStudent = await _pruebasDiagnosticasService.isAvailableForStudent(studentId, pruebaDiagnosticaId);
+            }
+            catch (Exception ex)
+            {
+
                 throw;
             }
         }

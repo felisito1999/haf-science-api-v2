@@ -8,6 +8,7 @@ namespace haf_science_api.Interfaces
     public interface IPruebasDiagnosticasService<T> where T : class
     {
         Task AssignToSession(AssignTestToSessionModel assignToSessionModel, int teacherId);
+        Task<bool> isAvailableForStudent(int studentId, int pruebaDiagnosticaId);
         Task<IEnumerable<T>> GetTeacherPaginatedPruebasDiagnosticas(int teacherId, int page, int pageSize);
         Task<int> GetTeacherPaginatedPruebasDiagnosticasCount(int teacherId);
         Task<IEnumerable<object>> GetPaginatedPruebasDiagnosticasBySessionId(int sessionId, int page, int pageSize);

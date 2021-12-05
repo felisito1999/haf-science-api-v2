@@ -262,7 +262,7 @@ namespace haf_science_api.Controllers
                 var confirmationEmail = new Message(
                     new string[] { user.CorreoElectronico },
                     "Recuperación de contraseña", 
-                    string.Format("Saludos {0}, dirijase al siguiente link para recuperar su contraseña: {1}reset-password/{2}", user.NombreUsuario, _frontEndInfo.Url, userHash), null);
+                    string.Format("Saludos {0}, dirijase al siguiente link para recuperar su contraseña: <a href=\"{1}#/reset-password/{2}\" target=\"_blank\">{1}reset-password/{2}</a>", user.NombreUsuario, _frontEndInfo.Url, userHash), null);
                 await _emailSenderService.SendEmailAsync(confirmationEmail);
 
                 return Ok(new Response()

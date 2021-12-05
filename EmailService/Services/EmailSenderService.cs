@@ -1,6 +1,7 @@
 ﻿using EmailService.Interfaces;
 using EmailService.Models;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Hosting;
 using MimeKit;
 using MimeKit.Utils;
 using System;
@@ -16,10 +17,12 @@ namespace EmailService.Services
     public class EmailSenderService : IEmailSender
     {
         private readonly EmailConfiguration _emailConfiguration;
+        private readonly IHostingEnvironment _appEnviroment;
 
-        public EmailSenderService(EmailConfiguration emailConfiguration)
+        public EmailSenderService(EmailConfiguration emailConfiguration, IHostingEnvironment appEnviroment)
         {
             _emailConfiguration = emailConfiguration;
+            _appEnviroment = appEnviroment;
         }
         public void SendEmail(Message email)
         {
@@ -44,20 +47,31 @@ namespace EmailService.Services
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
 
             var builder = new BodyBuilder();
-            string logoPath = "./Properties/Resources/tabla-periodica.png";
-            var logoImage = builder.LinkedResources.Add(logoPath);
-            logoImage.ContentId = MimeUtils.GenerateMessageId();
+            //Arreglar la imagen
+            //string logoPath = _appEnviroment.ContentRootPath + "/Properties/Resources/tabla-periodica.png";
+            string logoPath = "http://cdn.onlinewebfonts.com/svg/img_535155.png";
+            //var logoImage = builder.LinkedResources.Add(logoPath);
+            //logoImage.ContentId = MimeUtils.GenerateMessageId();
             builder.TextBody = message.Content;
+            //builder.HtmlBody = string
+            //    .Format(
+            //    @"<style>body{{ background-color: white;}} #header{{width:100%;display:flex; flex-direction:row; justify-content:center; align-items:flex-end;}}
+            //    </style>
+            //    <div id=""header"">
+            //    <img width=""150px"" src=""cid:{0}""></img>
+            //    <h1><b>Haf Science</b></h1></div><div><p>{1}</p>
+            //    </div>",
+            //    logoImage.ContentId, message.Content);
             builder.HtmlBody = string
                 .Format(
                 @"<style>body{{ background-color: white;}} #header{{width:100%;display:flex; flex-direction:row; justify-content:center; align-items:flex-end;}}
                 </style>
                 <div id=""header"">
-                <img width=""150px"" src=""cid:{0}""></img>
+                <img width=""150px"" src=""{0}""></img>
                 <h1><b>Haf Science</b></h1></div><div><p>{1}</p>
                 </div>",
-                logoImage.ContentId, message.Content);
-            
+                logoPath, message.Content);
+
             if (message.Attachments != null && message.Attachments.Any())
             {
                 byte[] fileBytes;

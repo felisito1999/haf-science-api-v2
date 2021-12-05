@@ -92,9 +92,19 @@ namespace haf_science_api.Controllers
                 {
                     var studentId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
+                    if (id.HasValue)
+                    {
+                        var session = await _sessionService.GetStudentSessionById((int)id, studentId);
+
+                        return StatusCode(StatusCodes.Status200OK,
+                            session);
+                    }
+
                     var sessions = await _sessionService.GetPaginatedStudentSessionsDataBy(page, pageSize, studentId);
-                    var totalRecords = _sessionService.GetPaginatedStudentSessionsCountBy(studentId);
-                    return Ok();
+                    var totalRecords = await _sessionService.GetPaginatedStudentSessionsCountBy(studentId);
+                    
+                    return StatusCode(StatusCodes.Status200OK,
+                            new PaginatedResponse<object> { Records = sessions, RecordsTotal = totalRecords }); ;
                 }
             }
             catch (Exception ex)

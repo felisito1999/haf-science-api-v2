@@ -147,3 +147,8 @@ C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\ref\haf-science-api.dll
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.pdb
 C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\obj\Debug\net5.0\haf-science-api.genruntimeconfig.cache
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\Microsoft.Extensions.Hosting.Abstractions.dll
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
