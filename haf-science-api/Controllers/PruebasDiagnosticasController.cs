@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,10 +16,13 @@ namespace haf_science_api.Controllers
     public class PruebasDiagnosticasController : ControllerBase
     {
         private readonly IPruebasDiagnosticasService<PruebasDiagnostica> _pruebasDiagnosticasService;
+        private readonly IUserService<UsuariosModel> _usersService;
 
-        public PruebasDiagnosticasController(IPruebasDiagnosticasService<PruebasDiagnostica> pruebasDiagnosticasService)
+        public PruebasDiagnosticasController(IPruebasDiagnosticasService<PruebasDiagnostica> pruebasDiagnosticasService,
+            IUserService<UsuariosModel> usersService)
         {
             _pruebasDiagnosticasService = pruebasDiagnosticasService;
+            _usersService = usersService;
         }
 
         [Route("teacher-pruebas-diagnosticas")]
@@ -50,20 +54,42 @@ namespace haf_science_api.Controllers
         }
         [Route("session-pruebas-diagnosticas")]
         [HttpGet]
+        [Authorize(Roles = "Docente,Estudiante")]
         public async Task<ActionResult> GetSessionPruebasDiagnosticas(int page, int pageSize, int sessionId)
         {
             try
             {
-                var pruebasDiagnosticas = await _pruebasDiagnosticasService
-                    .GetPaginatedPruebasDiagnosticasBySessionId(sessionId, page, pageSize);
-                var pruebasDiagnosticasCount = await _pruebasDiagnosticasService
-                    .GetPaginatedPruebasDiagnosticasBySessionIdCount(sessionId);
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var roleValue = claimsIdentity.Claims.ToArray()[8].Value;
+                int userId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
-                return Ok(new PaginatedResponse<object>()
+                if (roleValue == "Estudiante")
                 {
-                    Records = pruebasDiagnosticas,
-                    RecordsTotal = pruebasDiagnosticasCount
-                });
+                    var pruebasDiagnosticas = await _pruebasDiagnosticasService
+                    .GetPaginatedStudentPruebasDiagnosticasBySessionId(userId, sessionId, page, pageSize);
+                    var pruebasDiagnosticasCount = await _pruebasDiagnosticasService
+                        .GetPaginatedPruebasDiagnosticasBySessionIdCount(sessionId);
+
+                    return Ok(new PaginatedResponse<object>()
+                    {
+                        Records = pruebasDiagnosticas,
+                        RecordsTotal = pruebasDiagnosticasCount
+                    });
+                }
+                else
+                {
+                    var pruebasDiagnosticas = await _pruebasDiagnosticasService
+                    .GetPaginatedPruebasDiagnosticasBySessionId(sessionId, page, pageSize);
+                    var pruebasDiagnosticasCount = await _pruebasDiagnosticasService
+                        .GetPaginatedPruebasDiagnosticasBySessionIdCount(sessionId);
+
+                    return Ok(new PaginatedResponse<object>()
+                    {
+                        Records = pruebasDiagnosticas,
+                        RecordsTotal = pruebasDiagnosticasCount
+                    });
+                }
+
             }
             catch (Exception ex)
             {
@@ -131,18 +157,56 @@ namespace haf_science_api.Controllers
         [Route("get-attempt")]
         [HttpGet]
         [Authorize(Roles = "Estudiante")]
-        public async Task<ActionResult> GetAttempt(int pruebaDiagnosticaId)
+        public async Task<ActionResult> GetAttempt(int pruebaDiagnosticaId, int sessionId)
         {
             try
             {
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 int studentId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
-                bool isAvailableForStudent = await _pruebasDiagnosticasService.isAvailableForStudent(studentId, pruebaDiagnosticaId);
+                var test = await _pruebasDiagnosticasService.IsAvailableForStudent(studentId, sessionId, pruebaDiagnosticaId);
+                
+                if (test != null)
+                {
+                    var student = await _usersService.GetUsuarioById(studentId); 
+                    await _pruebasDiagnosticasService.StartTest(pruebaDiagnosticaId, student, sessionId);
+                    return Ok(test);
+                }
+                throw new Exception("Esta prueba no esta disponible");
             }
             catch (Exception ex)
             {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message.ToString()
+                    });
+                throw;
+            }
+        }
+        [Route("submit-attempt")]
+        [HttpPost]
+        [Authorize(Roles = "Estudiante")]
+        public async Task<ActionResult> SubmitAttempt(AttemptModel attemptInfo)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int studentId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
 
+                await _pruebasDiagnosticasService.EvaluateTestGrade(attemptInfo, attemptInfo.SessionId, studentId);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message.ToString()
+                    });
                 throw;
             }
         }

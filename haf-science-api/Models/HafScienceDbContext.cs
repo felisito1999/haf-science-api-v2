@@ -155,7 +155,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Directore>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F37DC69273")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3BFEC2E8D")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -181,7 +181,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Distrito>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCFA428509D")
+                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCF64A6A74E")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -458,7 +458,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Regionale>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF89CE3828")
+                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF39D004DC")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -547,7 +547,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<TiposCentrosEducativo>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFA1706CD9")
+                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCF2EB7D917")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -611,10 +611,10 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DACB63A0D5C")
+                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DACAE4935E6")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE05823BAA5")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE04E7FB0E1")
                     .IsUnique();
 
                 entity.Property(e => e.Codigo)
@@ -669,11 +669,11 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuarioRealizaPrueba>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("UsuarioRealizaPrueba");
 
-                entity.Property(e => e.Calificación).HasColumnType("decimal(4, 1)");
+                entity.Property(e => e.Calificacion).HasColumnType("decimal(4, 1)");
+
+                entity.Property(e => e.FechaCompletado).HasColumnType("datetime");
 
                 entity.Property(e => e.FechaCreacion)
                     .HasColumnType("datetime")
@@ -690,19 +690,19 @@ namespace haf_science_api.Models
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.PruebaDiagnostica)
-                    .WithMany()
+                    .WithMany(p => p.UsuarioRealizaPruebas)
                     .HasForeignKey(d => d.PruebaDiagnosticaId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PruebasDiagnosticas_UsuarioRealizaPrueba");
 
                 entity.HasOne(d => d.Session)
-                    .WithMany()
+                    .WithMany(p => p.UsuarioRealizaPruebas)
                     .HasForeignKey(d => d.SessionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Sesiones_UsuarioRealizaPrueba");
 
                 entity.HasOne(d => d.Usuario)
-                    .WithMany()
+                    .WithMany(p => p.UsuarioRealizaPruebas)
                     .HasForeignKey(d => d.UsuarioId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Usuarios_UsuarioRealizaPrueba");
@@ -710,7 +710,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F32DB259BE")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F3ED1BA45D")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)

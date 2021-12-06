@@ -10,6 +10,7 @@ namespace haf_science_api.Models
         public Sesione()
         {
             PruebasSesiones = new HashSet<PruebasSesione>();
+            UsuarioRealizaPruebas = new HashSet<UsuarioRealizaPrueba>();
             UsuariosSesiones = new HashSet<UsuariosSesione>();
         }
 
@@ -26,6 +27,7 @@ namespace haf_science_api.Models
         public virtual Usuario CreadoPorNavigation { get; set; }
         public virtual Estado Estado { get; set; }
         public virtual ICollection<PruebasSesione> PruebasSesiones { get; set; }
+        public virtual ICollection<UsuarioRealizaPrueba> UsuarioRealizaPruebas { get; set; }
         public virtual ICollection<UsuariosSesione> UsuariosSesiones { get; set; }
     }
 }

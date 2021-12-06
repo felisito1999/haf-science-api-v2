@@ -29,5 +29,6 @@ namespace haf_science_api.Interfaces
         public Task<IEnumerable<object>> GetPaginatedStudentSessionsDataBy(int page, int pageSize,
              int studentId);
         public Task<int> GetPaginatedStudentSessionsCountBy(int studentId);
+        public Task<object> GetSessionStudentActivity(int sessionId);
     }
 }

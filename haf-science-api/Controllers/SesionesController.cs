@@ -118,6 +118,30 @@ namespace haf_science_api.Controllers
                 throw;
             }
         }
+        [HttpGet]
+        [Route("session-activity")]
+        public async Task<IActionResult> GetSessionActivity(int sessionId)
+        {
+            try
+            {
+                //var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                //int userId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                var sessionActivity = await _sessionService.GetSessionStudentActivity(sessionId);
+
+                return Ok(sessionActivity);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.ToString()
+                    });
+                throw;
+            }
+        }
         [HttpPost]
         public async Task<ActionResult> Save(SessionSaveUpdateModel session)
         {

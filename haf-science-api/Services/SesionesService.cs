@@ -426,5 +426,23 @@ namespace haf_science_api.Services
                 throw;
             }
         }
+
+        public async Task<object> GetSessionStudentActivity(int sessionId)
+        {
+            try
+            {
+                var studentActivity = await _dbContext.UsuarioRealizaPruebas.
+                    Select(realizaPrueba => new { realizaPrueba.SessionId, realizaPrueba.IntentoCompletado, realizaPrueba.FechaCreacion, realizaPrueba.FechaCompletado, realizaPrueba.Calificacion, PruebaDiagnostica = realizaPrueba.PruebaDiagnostica, Usuario = realizaPrueba.Usuario })
+                    .Where(realizaPrueba => realizaPrueba.SessionId == sessionId)
+                    .ToListAsync();
+
+                return studentActivity;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
     }
 }

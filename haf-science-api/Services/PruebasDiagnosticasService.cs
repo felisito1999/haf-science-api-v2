@@ -49,8 +49,8 @@ namespace haf_science_api.Services
                     NombreSesion = session.Nombre,
                     DuracionMinutos = model.DuracionMinutos,
                     CantidadIntentos = model.CantidadIntentos,
-                    FechaInicio = model.FechaInicio,
-                    FechaLimite = model.FechaLimite,
+                    FechaInicio = model.FechaInicio.ToLocalTime(),
+                    FechaLimite = model.FechaLimite.ToLocalTime(),
                 };
                 await _dbContext.PruebasSesiones.AddAsync(pruebaSesion);
                 await _dbContext.SaveChangesAsync();
@@ -76,7 +76,7 @@ namespace haf_science_api.Services
                     .Where(prueba => prueba.Eliminado == false && 
                         prueba.PruebaSesion.SesionId == sessionId && 
                         prueba.PruebaSesion.Eliminado == false)
-                    .OrderByDescending(prueba => prueba.PruebaSesion.FechaInicio)
+                    .OrderBy(prueba => prueba.PruebaSesion.FechaInicio)
                     .Skip(skip).Take(pageSize).ToListAsync();
 
                 return pruebasDiagnosticas;
@@ -148,30 +148,6 @@ namespace haf_science_api.Services
                 throw;
             }
         }
-
-        public async Task<bool> isAvailableForStudent(int studentId, int pruebaDiagnosticaId)
-        {
-            try
-            {
-                var pruebaInfo = await _dbContext.PruebasDiagnosticas
-                    .Select(pruebaDiagnostica => new { pruebaDiagnostica.Id, PruebasSesiones = pruebaDiagnostica.PruebasSesiones.Where(pruebaSesion => pruebaSesion.Eliminado == false) })
-                    .Where(pruebaDiagnostica => pruebaDiagnostica.Id == pruebaDiagnosticaId)
-                    .SingleOrDefaultAsync();
-
-                if (pruebaInfo == null)
-                {
-                    return false;
-                }
-
-                bool isAssignedToSession
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                throw;
-            }
-        }
-
         public async Task SavePruebaDiagnostica(PruebasDiagnosticasModel pruebaDiagnostica, int teacherId)
         {
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
@@ -183,7 +159,10 @@ namespace haf_science_api.Services
 
                 List<PruebasPregunta> pruebasPreguntas = new List<PruebasPregunta>();
 
-                double valoracion = pruebaDiagnostica.Preguntas.Any() ? 0.00 : (double)pruebaDiagnostica.PruebaDiagnostica.CalificacionMaxima / pruebaDiagnostica.Preguntas.Count();
+                double valoracion = !pruebaDiagnostica.Preguntas.Any() && 
+                    pruebaDiagnostica.PruebaDiagnostica.CalificacionMaxima != 0 ?
+                    0.00 : 
+                    (double)pruebaDiagnostica.PruebaDiagnostica.CalificacionMaxima / pruebaDiagnostica.Preguntas.Count();
                 
                 foreach(var pregunta in pruebaDiagnostica.Preguntas)
                 {
@@ -210,6 +189,240 @@ namespace haf_science_api.Services
                 _logger.LogInformation(ex.ToString());
                 throw;
             }
+        }
+        public async Task<object> IsAvailableForStudent(int studentId, int sessionId, int pruebaDiagnosticaId)
+        {
+            try
+            {
+                var pruebaInfo = await _dbContext.PruebasDiagnosticas
+                    .Select(pruebaDiagnostica => new {
+                        pruebaDiagnostica.Id,
+                        pruebaDiagnostica.Titulo,
+                        PruebasSesiones = pruebaDiagnostica.PruebasSesiones
+                        .Select(pruebaSesion => new { pruebaSesion.DuracionMinutos, pruebaSesion.SesionId, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.Eliminado})
+                        .Where(pruebaSesion => pruebaSesion.SesionId == sessionId && pruebaSesion.Eliminado == false).FirstOrDefault(),
+                        Preguntas = pruebaDiagnostica.PruebasPregunta.Where(pruebaPregunta => pruebaPregunta.PruebaId == pruebaDiagnosticaId).Select(pruebaPregunta => new { pruebaPregunta.PreguntaId, pruebaPregunta.TituloPregunta, Respuestas = pruebaPregunta.Pregunta.Respuesta.Select(respuesta => new { respuesta.Id, respuesta.Contenido, selected = false })}),
+                        pruebaDiagnostica.Eliminado
+                    })
+                    .Where(pruebaDiagnostica => pruebaDiagnostica.Id == pruebaDiagnosticaId && 
+                    pruebaDiagnostica.PruebasSesiones.SesionId == sessionId && 
+                    pruebaDiagnostica.Eliminado == false)
+                    .SingleOrDefaultAsync();
+
+                var usuarioRealizaPrueba = await _dbContext.UsuarioRealizaPruebas
+                    .Where(realizaPrueba => realizaPrueba.SessionId == sessionId &&
+                    realizaPrueba.PruebaDiagnosticaId == pruebaDiagnosticaId &&
+                    realizaPrueba.SessionId == sessionId && 
+                    realizaPrueba.IntentoCompletado == true)
+                    .CountAsync();
+
+
+                if (!(pruebaInfo.PruebasSesiones.FechaInicio <= DateTime.Now &&
+                    pruebaInfo.PruebasSesiones.FechaLimite >= DateTime.Now))
+                {
+                    throw new Exception("No puede tomar la prueba porque esta fuera del tiempo especificado");
+                }
+
+                //Validación temporal en lo que se agrega la parte de los intentos.
+                if (usuarioRealizaPrueba > 0)
+                {
+                    throw new Exception("Ya ha realizado esta prueba en esta sesión");
+                }
+
+                if (pruebaInfo == null)
+                {
+                    throw new Exception("La prueba solicitada no es válida");
+                }
+
+                var studentSessions = await _dbContext.UsuariosSesiones
+                    .Where(usuarioSesion => usuarioSesion.UsuarioId == studentId &&
+                    usuarioSesion.Eliminado == false && usuarioSesion.SesionId == sessionId)
+                    .ToListAsync();
+                
+                if(!studentSessions.Any())
+                {
+                    throw new Exception("La prueba solicitada no es válida");
+                }
+                
+                //foreach (var studentSession in pruebaInfo.PruebasSesiones)
+                //{
+                //    bool isAvailable = pruebaInfo.PruebasSesiones.Where(pruebaSesion => pruebaSesion.SesionId == studentSession.SesionId).Any();
+
+                //    if (isAvailable)
+                //    {
+                //        return pruebaInfo;
+                //    }
+                //}
+
+                return pruebaInfo;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+        public async Task EvaluateTestGrade(AttemptModel attempt, int sessionId, int studentId)
+        {
+            try
+            {
+                var pruebaPreguntas = await _dbContext.PruebasDiagnosticas
+                    .Select(prueba => new { prueba.Id, Preguntas =  prueba.PruebasPregunta.Select(pruebaPregunta => new { pruebaPregunta.Pregunta.Id, pruebaPregunta.Valoracion, Respuestas = pruebaPregunta.Pregunta.Respuesta.Select(respuesta => new { respuesta.Id, respuesta.EsCorrecta})})}) 
+                    .Where(prueba => prueba.Id == attempt.PruebaId)
+                    .SingleOrDefaultAsync();
+
+                //var pruebaPreguntas = await _dbContext.PruebasDiagnosticas
+                //    .Select(prueba => new { prueba.Id, PruebasPreguntas = new { pruebaPregunta.Pregunta.Id, Respuestas = pruebaPregunta.Pregunta.Respuesta.Select(respuesta => new { respuesta.Id, respuesta.EsCorrecta }) } } )
+                //    .Where(pruebaPregunta => pruebaPregunta.PruebaId == attempt.PruebaId)
+                //    .ToListAsync();
+                if (pruebaPreguntas == null)
+                {
+                    throw new Exception("Ha ocurrido un error");
+                }
+
+                double calificacion = 0;
+
+                foreach(var pregunta in pruebaPreguntas.Preguntas)
+                {
+                    foreach (var respuesta in pregunta.Respuestas)
+                    {
+                        var attemptPreguntaInfo = attempt.Preguntas
+                            .Where(attemptPregunta => attemptPregunta.PreguntaId == pregunta.Id)
+                            .SingleOrDefault();
+
+                        var selectedRespuesta = attemptPreguntaInfo.Respuestas
+                            .Where(attemptRespuesta => attemptRespuesta.Id == respuesta.Id)
+                            .SingleOrDefault();
+
+                        if (selectedRespuesta.Selected && respuesta.EsCorrecta)
+                        {
+                            calificacion += (double)pregunta.Valoracion;
+                        }
+                        //foreach(var attemptRespuesta in attemptPreguntaInfo.Respuestas)
+                        //{
+                        //    if (attemptRespuesta.)
+                        //}
+                    }
+                }
+                var usuarioRealizaPrueba = await _dbContext.UsuarioRealizaPruebas
+                    .Where(realizaPrueba => realizaPrueba.PruebaDiagnosticaId == attempt.PruebaId && 
+                    realizaPrueba.UsuarioId == studentId && realizaPrueba.SessionId == attempt.SessionId)
+                    .SingleOrDefaultAsync();
+
+                if (usuarioRealizaPrueba != null)
+                {
+                    usuarioRealizaPrueba.IntentoCompletado = true;
+                    usuarioRealizaPrueba.FechaCompletado = DateTime.Now;
+                    usuarioRealizaPrueba.Calificacion = (decimal)Math.Ceiling(calificacion);
+
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Ha ocurrido un error al momento de guardar el intento de prueba");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task StartTest(int pruebaDiagnosticaId, UsuariosModel student, int sessionId)
+        {
+            try
+            {
+                var usuarioRealizaPruebas = await _dbContext.UsuarioRealizaPruebas
+                    .Where(realizacion => realizacion.PruebaDiagnosticaId == pruebaDiagnosticaId &&
+                    realizacion.SessionId == sessionId)
+                    .SingleOrDefaultAsync();
+
+                if (usuarioRealizaPruebas == null)
+                {
+                    var pruebaDiagnostica = await GetPruebaDiagnosticaById(pruebaDiagnosticaId);
+
+                    if (pruebaDiagnostica == null)
+                    {
+                        throw new Exception("La prueba diagnóstica no es válida");
+                    }
+
+                    UsuarioRealizaPrueba usuarioRealizaPrueba = new UsuarioRealizaPrueba()
+                    {
+                        UsuarioId = student.Id, 
+                        PruebaDiagnosticaId = pruebaDiagnosticaId,
+                        SessionId = sessionId,
+                        NombreUsuario = student.NombreUsuario,
+                        TituloPrueba = pruebaDiagnostica.Titulo,
+                        Calificacion = 0,
+                        FechaCompletado = null,
+                        IntentoCompletado = false,
+                        FechaCreacion = DateTime.UtcNow
+                    };
+
+                    await _dbContext.UsuarioRealizaPruebas
+                        .AddAsync(usuarioRealizaPrueba);
+
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<PruebasDiagnostica> GetPruebaDiagnosticaById(int pruebaDiagnosticaId)
+        {
+            try
+            {
+                var pruebaDiagnostica = await _dbContext.PruebasDiagnosticas
+                    .Where(prueba => prueba.Id == pruebaDiagnosticaId)
+                    .SingleOrDefaultAsync();
+
+                return pruebaDiagnostica;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<object>> GetPaginatedStudentPruebasDiagnosticasBySessionId(int studentId, int sessionId, int page, int pageSize)
+        {
+            try
+            {
+                //Falta agregar la parte de que se presenten las sesiones que pertenecen a una sesión.
+                int skip = (page - 1) * pageSize;
+
+                var pruebasDiagnosticas = await _dbContext.PruebasDiagnosticas
+                    .Select(prueba => new {
+                        prueba.Id,
+                        prueba.Titulo,
+                        PruebaSesion = prueba.PruebasSesiones.Select(pruebaSesion => new { pruebaSesion.SesionId, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.DuracionMinutos, pruebaSesion.Eliminado }).Where(pruebaSesion => pruebaSesion.SesionId == sessionId).SingleOrDefault(),
+                        UsuarioRealizaPrueba = prueba.UsuarioRealizaPruebas.Select(realizaPrueba => new { realizaPrueba.PruebaDiagnosticaId, realizaPrueba.SessionId, realizaPrueba.Calificacion, realizaPrueba.IntentoCompletado}).Where(realizaPrueba => realizaPrueba.SessionId == sessionId).SingleOrDefault(),
+                        prueba.Eliminado
+                    })
+                    .Where(prueba => prueba.Eliminado == false &&
+                        prueba.PruebaSesion.SesionId == sessionId &&
+                        prueba.PruebaSesion.Eliminado == false)
+                    .OrderBy(prueba => prueba.PruebaSesion.FechaInicio)
+                    .Skip(skip).Take(pageSize).ToListAsync();
+
+                return pruebasDiagnosticas;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+                throw;
+            }
+        }
+
+        public Task<int> GetPaginatedStudentPruebasDiagnosticasBySessionIdCount(int sessionId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -16,6 +16,7 @@ namespace haf_science_api.Models
             Respuesta = new HashSet<Respuesta>();
             Sesiones = new HashSet<Sesione>();
             UserHashes = new HashSet<UserHash>();
+            UsuarioRealizaPruebas = new HashSet<UsuarioRealizaPrueba>();
             UsuariosInsigniaAsignadoPorNavigations = new HashSet<UsuariosInsignia>();
             UsuariosInsigniaUsuarios = new HashSet<UsuariosInsignia>();
             UsuariosLogs = new HashSet<UsuariosLog>();
@@ -47,6 +48,7 @@ namespace haf_science_api.Models
         public virtual ICollection<Respuesta> Respuesta { get; set; }
         public virtual ICollection<Sesione> Sesiones { get; set; }
         public virtual ICollection<UserHash> UserHashes { get; set; }
+        public virtual ICollection<UsuarioRealizaPrueba> UsuarioRealizaPruebas { get; set; }
         public virtual ICollection<UsuariosInsignia> UsuariosInsigniaAsignadoPorNavigations { get; set; }
         public virtual ICollection<UsuariosInsignia> UsuariosInsigniaUsuarios { get; set; }
         public virtual ICollection<UsuariosLog> UsuariosLogs { get; set; }

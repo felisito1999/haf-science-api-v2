@@ -11,6 +11,7 @@ namespace haf_science_api.Models
         {
             PruebasPregunta = new HashSet<PruebasPregunta>();
             PruebasSesiones = new HashSet<PruebasSesione>();
+            UsuarioRealizaPruebas = new HashSet<UsuarioRealizaPrueba>();
         }
 
         public int Id { get; set; }
@@ -25,5 +26,6 @@ namespace haf_science_api.Models
         public virtual Estado Estado { get; set; }
         public virtual ICollection<PruebasPregunta> PruebasPregunta { get; set; }
         public virtual ICollection<PruebasSesione> PruebasSesiones { get; set; }
+        public virtual ICollection<UsuarioRealizaPrueba> UsuarioRealizaPruebas { get; set; }
     }
 }
