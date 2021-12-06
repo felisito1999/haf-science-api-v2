@@ -410,12 +410,12 @@ namespace haf_science_api.Services
                         sesion.Nombre,
                         sesion.Descripcion,
                         NombreCentroEducativo = sesion.CentroEducativo.Nombre,
-                        UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).Where(usuarioSesion => usuarioSesion.UsuarioId == studentId).SingleOrDefault(),
+                        UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.SesionId, usuarioSesion.Eliminado }).Where(usuarioSesion => usuarioSesion.UsuarioId == studentId && usuarioSesion.SesionId == id).SingleOrDefault(),
                         sesion.FechaCreacion,
                         sesion.Eliminado
                     })
                 .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
-                sesion.UsuariosSesiones.Eliminado == false)
+                 sesion.Id == id && sesion.UsuariosSesiones.Eliminado == false)
                 .SingleOrDefaultAsync();
 
                 return session;
