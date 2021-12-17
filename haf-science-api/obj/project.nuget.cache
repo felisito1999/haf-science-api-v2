@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "W9heWeZSqQHIK8quoYSWaM052DfMGk08e06Z8mkiXY1lUXVBLX8iNft7OQa7xQMUgEKX9Cc3G9IE8dJzVqNwXg==",
+  "dgSpecHash": "jA1CgVZWIqyteJzEYSeUgq04Oi6GVU4vM3w1CqCPqpsmkpR42dlTTM5hXQKTpBikxaMFJ0Xm3JOzXGDUViXzIQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\felej\\OneDrive\\Escritorio\\Proyecto tabla periódica\\haf-science-api\\haf-science-api\\haf-science-api.csproj",
   "expectedPackageFiles": [
@@ -175,7 +175,8 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmldocument\\4.3.0\\system.xml.xmldocument.4.3.0.nupkg.sha512",
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmlserializer\\4.3.0\\system.xml.xmlserializer.4.3.0.nupkg.sha512"
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmlserializer\\4.3.0\\system.xml.xmlserializer.4.3.0.nupkg.sha512",
+    "C:\\Users\\felej\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.12\\microsoft.netcore.app.host.win-x64.5.0.12.nupkg.sha512"
   ],
   "logs": []
 }
