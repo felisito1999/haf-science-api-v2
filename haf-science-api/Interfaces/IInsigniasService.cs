@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using haf_science_api.Models;
 using System.Threading.Tasks;
 
 namespace haf_science_api.Interfaces
 {
-    public interface IInsigniasService<T>
-        where T : class 
+    public interface IInsigniasService<T> where T : class
     {
-        public Task<IEnumerable<T>> GetAll();
+        Task<Insignia> GetInsigniaById (int insigniaId);
+        Task SaveBadge (Insignia insignia);
+        Task<object> GetStudentSessionsInsignias (int studentId, int sessionId);
+        Task AssignInsigniaToSessionStudent (int insigniaId, int studentId, int sessionId);
     }
 }

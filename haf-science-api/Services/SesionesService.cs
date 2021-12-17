@@ -195,7 +195,7 @@ namespace haf_science_api.Services
                     sesion.Nombre,
                     sesion.Descripcion,
                     NombreCentroEducativo = sesion.CentroEducativo.Nombre,
-                    UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).SingleOrDefault(),
+                    UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).Where(usuarioSesion => usuarioSesion.UsuarioId == studentId).SingleOrDefault(),
                     sesion.FechaCreacion,
                     sesion.Eliminado
                 })
@@ -211,10 +211,15 @@ namespace haf_science_api.Services
             int skip = (page - 1) * pageSize;
 
             var sesiones = await _dbContext.Sesiones
-                .Select(sesion => new { sesion.Id, sesion.Nombre, sesion.Descripcion, NombreCentroEducativo = sesion.CentroEducativo.Nombre,
+                .Select(sesion => new { 
+                    sesion.Id, 
+                    sesion.Nombre, 
+                    sesion.Descripcion, 
+                    NombreCentroEducativo = sesion.CentroEducativo.Nombre,
                     UsuariosSesiones = sesion.UsuariosSesiones.Select(usuarioSesion => new { usuarioSesion.UsuarioId, usuarioSesion.Eliminado }).Where(usuarioSesion => usuarioSesion.UsuarioId == studentId).SingleOrDefault(),
+                    Profesor = $"{sesion.CreadoPorNavigation.UsuarioDetalle.Nombres} {sesion.CreadoPorNavigation.UsuarioDetalle.Apellidos}",
                     sesion.FechaCreacion, sesion.Eliminado })
-                                .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
+                .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
                 sesion.UsuariosSesiones.Eliminado == false)
                 .OrderByDescending(sesion => sesion.FechaCreacion)
                 .Skip(skip).Take(pageSize)
@@ -414,7 +419,7 @@ namespace haf_science_api.Services
                         sesion.FechaCreacion,
                         sesion.Eliminado
                     })
-                .Where(sesion => sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
+                .Where(sesion => sesion.Id == id && sesion.UsuariosSesiones.UsuarioId == studentId && sesion.Eliminado == false &&
                 sesion.UsuariosSesiones.Eliminado == false)
                 .SingleOrDefaultAsync();
 

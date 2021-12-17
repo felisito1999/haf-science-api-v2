@@ -24,6 +24,28 @@ namespace haf_science_api.Controllers
             _pruebasDiagnosticasService = pruebasDiagnosticasService;
             _usersService = usersService;
         }
+        [Route("test-details")]
+        [HttpGet]
+        [Authorize(Roles = "Docente,Estudiante")]
+        public async Task<IActionResult> GetSessionTestDetail(int testId, int sessionId)
+        {
+            try
+            {
+                var pruebaDiagnostica = await _pruebasDiagnosticasService.GetSessionPruebaDiagnosticaById(testId, sessionId);
+
+                return Ok(pruebaDiagnostica);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message
+                    });
+                throw;
+            }
+        }
 
         [Route("teacher-pruebas-diagnosticas")]
         [HttpGet]
@@ -68,7 +90,7 @@ namespace haf_science_api.Controllers
                     var pruebasDiagnosticas = await _pruebasDiagnosticasService
                     .GetPaginatedStudentPruebasDiagnosticasBySessionId(userId, sessionId, page, pageSize);
                     var pruebasDiagnosticasCount = await _pruebasDiagnosticasService
-                        .GetPaginatedPruebasDiagnosticasBySessionIdCount(sessionId);
+                        .GetPaginatedStudentPruebasDiagnosticasBySessionIdCount(sessionId);
 
                     return Ok(new PaginatedResponse<object>()
                     {
@@ -206,6 +228,106 @@ namespace haf_science_api.Controllers
                     {
                         Status = "Error",
                         Message = ex.Message.ToString()
+                    });
+                throw;
+            }
+        }
+        [Route("session-average-grades")]
+        [HttpGet]
+        [Authorize(Roles = "Docente")]
+        public async Task<ActionResult> GetSessionAverageGrades(int sessionId)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                var grades = await _pruebasDiagnosticasService.GetSessionAverageGrades(sessionId, teacherId);
+
+                return Ok(grades);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response() 
+                    { 
+                        Status= "Error",
+                        Message= ex.Message
+                    });
+                throw;
+            }
+        }
+        [Route("session-test-average-grades")]
+        [HttpGet]
+        [Authorize(Roles = "Docente")]
+        public async Task<ActionResult> GetSessionTestAverageGrades(int sessionId, int testId)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                var grades = await _pruebasDiagnosticasService.GetSessionTestAverageGrades(sessionId, testId, teacherId);
+
+                return Ok(grades);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message
+                    });
+                throw;
+            }
+        }
+        [Route("student-session-average-grades")]
+        [HttpGet]
+        [Authorize(Roles = "Docente")]
+        public async Task<ActionResult> GetStudentSessionAverageGrades(int sessionId, int studentId)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                var grades = await _pruebasDiagnosticasService.GetStudentSessionAverageGrades(sessionId, studentId, teacherId);
+
+                return Ok(grades);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message
+                    });
+                throw;
+            }
+        }
+        [Route("session-test-grades")]
+        [HttpGet]
+        [Authorize(Roles = "Docente")]
+        public async Task<ActionResult> GetTestSessionGrades(int sessionId, int testId)
+        {
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                int teacherId = Convert.ToInt32(claimsIdentity.FindFirst("id").Value);
+
+                var grades = await _pruebasDiagnosticasService.GetTestSessionGrades(testId, sessionId, teacherId);
+
+                return Ok(grades);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response()
+                    {
+                        Status = "Error",
+                        Message = ex.Message
                     });
                 throw;
             }

@@ -335,7 +335,7 @@ namespace haf_science_api.Services
             {
                 var usuarioRealizaPruebas = await _dbContext.UsuarioRealizaPruebas
                     .Where(realizacion => realizacion.PruebaDiagnosticaId == pruebaDiagnosticaId &&
-                    realizacion.SessionId == sessionId)
+                    realizacion.SessionId == sessionId && realizacion.UsuarioId == student.Id)
                     .SingleOrDefaultAsync();
 
                 if (usuarioRealizaPruebas == null)
@@ -357,7 +357,7 @@ namespace haf_science_api.Services
                         Calificacion = 0,
                         FechaCompletado = null,
                         IntentoCompletado = false,
-                        FechaCreacion = DateTime.UtcNow
+                        FechaCreacion = DateTime.Now
                     };
 
                     await _dbContext.UsuarioRealizaPruebas
@@ -378,7 +378,33 @@ namespace haf_science_api.Services
             try
             {
                 var pruebaDiagnostica = await _dbContext.PruebasDiagnosticas
-                    .Where(prueba => prueba.Id == pruebaDiagnosticaId)
+                    .Where(prueba => prueba.Id == pruebaDiagnosticaId && prueba.Eliminado == false)
+                    .SingleOrDefaultAsync();
+
+                return pruebaDiagnostica;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<object> GetSessionPruebaDiagnosticaById(int pruebaDiagnosticaId, int sessionId)
+        {
+            try
+            {
+                var pruebaDiagnostica = await _dbContext.PruebasDiagnosticas.
+                    Select(prueba => new
+                    {
+                        prueba.Id,
+                        prueba.Titulo,
+                        prueba.CalificacionMaxima,
+                        PruebaSesion = prueba.PruebasSesiones.Select(pruebaSesion => new { pruebaSesion.SesionId, Duracion = pruebaSesion.DuracionMinutos, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.Eliminado }).Where(pruebaSesion => pruebaSesion.SesionId == sessionId).SingleOrDefault(),
+                        CantidadPreguntas = prueba.PruebasPregunta.Count(),
+                        prueba.Eliminado
+                    })
+                    .Where(prueba => prueba.Id == pruebaDiagnosticaId && prueba.PruebaSesion.SesionId == sessionId)
                     .SingleOrDefaultAsync();
 
                 return pruebaDiagnostica;
@@ -401,14 +427,16 @@ namespace haf_science_api.Services
                     .Select(prueba => new {
                         prueba.Id,
                         prueba.Titulo,
+                        prueba.CalificacionMaxima,
                         PruebaSesion = prueba.PruebasSesiones.Select(pruebaSesion => new { pruebaSesion.SesionId, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.DuracionMinutos, pruebaSesion.Eliminado }).Where(pruebaSesion => pruebaSesion.SesionId == sessionId).SingleOrDefault(),
-                        UsuarioRealizaPrueba = prueba.UsuarioRealizaPruebas.Select(realizaPrueba => new { realizaPrueba.PruebaDiagnosticaId, realizaPrueba.SessionId, realizaPrueba.Calificacion, realizaPrueba.IntentoCompletado}).Where(realizaPrueba => realizaPrueba.SessionId == sessionId).SingleOrDefault(),
+                        UsuarioRealizaPrueba = prueba.UsuarioRealizaPruebas.Select(realizaPrueba => new { realizaPrueba.UsuarioId, realizaPrueba.PruebaDiagnosticaId, realizaPrueba.SessionId, realizaPrueba.Calificacion, realizaPrueba.IntentoCompletado, Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (prueba.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0 }).Where(realizaPrueba => realizaPrueba.UsuarioId == studentId && realizaPrueba.SessionId == sessionId).SingleOrDefault(),
                         prueba.Eliminado
                     })
-                    .Where(prueba => prueba.Eliminado == false &&
+                    .Where(prueba => 
+                        prueba.Eliminado == false &&
                         prueba.PruebaSesion.SesionId == sessionId &&
                         prueba.PruebaSesion.Eliminado == false)
-                    .OrderBy(prueba => prueba.PruebaSesion.FechaInicio)
+                    .OrderBy(prueba => prueba.UsuarioRealizaPrueba.IntentoCompletado).ThenBy(prueba => prueba.PruebaSesion.FechaInicio)
                     .Skip(skip).Take(pageSize).ToListAsync();
 
                 return pruebasDiagnosticas;
@@ -420,9 +448,180 @@ namespace haf_science_api.Services
             }
         }
 
-        public Task<int> GetPaginatedStudentPruebasDiagnosticasBySessionIdCount(int sessionId)
+        public async Task<int> GetPaginatedStudentPruebasDiagnosticasBySessionIdCount(int sessionId)
         {
-            throw new NotImplementedException();
+            var pruebasDiagnosticasCount = await _dbContext.PruebasDiagnosticas
+                    .Select(prueba => new
+                    {
+                        prueba.Id,
+                        prueba.Titulo,
+                        PruebaSesion = prueba.PruebasSesiones.Select(pruebaSesion => new { pruebaSesion.SesionId, pruebaSesion.FechaInicio, pruebaSesion.FechaLimite, pruebaSesion.DuracionMinutos, pruebaSesion.Eliminado }).Where(pruebaSesion => pruebaSesion.SesionId == sessionId).SingleOrDefault(),
+                        UsuarioRealizaPrueba = prueba.UsuarioRealizaPruebas.Select(realizaPrueba => new { realizaPrueba.PruebaDiagnosticaId, realizaPrueba.SessionId, realizaPrueba.Calificacion, realizaPrueba.IntentoCompletado}).Where(realizaPrueba => realizaPrueba.SessionId == sessionId).SingleOrDefault(),
+                        prueba.Eliminado
+                    })
+                    .Where(prueba => prueba.Eliminado == false &&
+                        prueba.PruebaSesion.SesionId == sessionId &&
+                        prueba.PruebaSesion.Eliminado == false)
+                    .CountAsync();
+
+            return pruebasDiagnosticasCount;
+        }
+
+        public async Task<object> GetSessionAverageGrades(int sessionId, int teacherId)
+        {
+            try
+            {
+                var grades = await _dbContext.UsuarioRealizaPruebas
+                .Select(realizaPrueba => new { realizaPrueba.SessionId, realizaPrueba.PruebaDiagnostica.CalificacionMaxima, realizaPrueba.Calificacion,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    realizaPrueba.IntentoCompletado, 
+                    SesionCreadoPor = realizaPrueba.Session.CreadoPor })
+                .Where(intento => intento.SessionId == sessionId && intento.IntentoCompletado == true && intento.SesionCreadoPor == teacherId)
+                .ToListAsync();
+
+                if(grades.Any())
+                {
+                    double average = 0.00;
+
+                    foreach (var grade in grades)
+                    {
+                        average += (double)grade.Porcentaje;
+                    }
+
+                    average /= grades.Count();
+
+                    return new
+                    {
+                        NotaPromedio = average
+                    };
+                }
+
+                return null; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<object> GetSessionTestAverageGrades(int sessionId, int testId, int teacherId)
+        {
+            try
+            {
+                var grades = await _dbContext.UsuarioRealizaPruebas
+                .Select(realizaPrueba => new {
+                    realizaPrueba.PruebaDiagnosticaId,
+                    realizaPrueba.SessionId,
+                    realizaPrueba.PruebaDiagnostica.CalificacionMaxima,
+                    realizaPrueba.Calificacion,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    realizaPrueba.IntentoCompletado,
+                    SesionCreadoPor = realizaPrueba.Session.CreadoPor
+                })
+                .Where(intento => intento.SessionId == sessionId && intento.IntentoCompletado == true && intento.PruebaDiagnosticaId == testId && intento.SesionCreadoPor == teacherId)
+                .ToListAsync();
+
+                if(grades.Any())
+                {
+                    double average = 0.00;
+                    
+                    foreach(var grade in grades)
+                    {
+                        average += (double)grade.Porcentaje;
+                    }
+
+                    average /= grades.Count();
+
+                    return new
+                    {
+                        NotaPromedio = average
+                    };
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<object> GetStudentSessionAverageGrades(int sessionId, int studentId, int teacherId)
+        {
+            try
+            {
+                var grades = await _dbContext.UsuarioRealizaPruebas
+                .Select(realizaPrueba => new {
+                    realizaPrueba.PruebaDiagnosticaId,
+                    realizaPrueba.UsuarioId,
+                    realizaPrueba.SessionId,
+                    realizaPrueba.PruebaDiagnostica.CalificacionMaxima,
+                    realizaPrueba.Calificacion,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    realizaPrueba.IntentoCompletado,
+                    SesionCreadoPor = realizaPrueba.Session.CreadoPor
+                })
+                .Where(intento => intento.SessionId == sessionId && intento.IntentoCompletado == true && intento.UsuarioId == studentId && intento.SesionCreadoPor == teacherId)
+                .ToListAsync();
+
+                if (grades.Any())
+                {
+                    double average = 0.00;
+
+                    foreach (var grade in grades)
+                    {
+                        average += (double)grade.Porcentaje;
+                    }
+
+                    average /= grades.Count();
+
+                    return new
+                    {
+                        NotaPromedio = average
+                    };
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<object>> GetTestSessionGrades(int testId, int sessionId, int teacherId)
+        {
+            try
+            {
+                var grades = await _dbContext.UsuarioRealizaPruebas
+                .Select(realizaPrueba => new {
+                    realizaPrueba.PruebaDiagnosticaId,
+                    Usuario = new {realizaPrueba.Usuario.Id, realizaPrueba.Usuario.NombreUsuario, realizaPrueba.Usuario.UsuarioDetalle.Nombres, realizaPrueba.Usuario.UsuarioDetalle.Apellidos},
+                    realizaPrueba.SessionId,
+                    realizaPrueba.PruebaDiagnostica.CalificacionMaxima,
+                    realizaPrueba.Calificacion,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    realizaPrueba.IntentoCompletado,
+                    SesionCreadoPor = realizaPrueba.Session.CreadoPor
+                })
+                .Where(intento => intento.SessionId == sessionId && intento.IntentoCompletado == true && intento.PruebaDiagnosticaId == testId && intento.SesionCreadoPor == teacherId)
+                .ToListAsync();
+
+                if (grades.Any())
+                {
+                    return grades;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                throw;
+            }
         }
     }
 }
