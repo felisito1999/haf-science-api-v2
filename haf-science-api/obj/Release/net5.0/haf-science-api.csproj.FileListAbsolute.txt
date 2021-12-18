@@ -307,3 +307,4 @@ C:\Users\felix.perez\Desktop\HAF P\haf-science-api-v2\haf-science-api\obj\Releas
 C:\Users\felix.perez\Desktop\HAF P\haf-science-api-v2\haf-science-api\obj\Release\net5.0\ref\haf-science-api.dll
 C:\Users\felix.perez\Desktop\HAF P\haf-science-api-v2\haf-science-api\obj\Release\net5.0\haf-science-api.pdb
 C:\Users\felix.perez\Desktop\HAF P\haf-science-api-v2\haf-science-api\obj\Release\net5.0\haf-science-api.genruntimeconfig.cache
+C:\Users\felej\OneDrive\Escritorio\Proyecto tabla periódica\haf-science-api\haf-science-api\bin\Release\net5.0\haf-science-api.StaticWebAssets.xml
