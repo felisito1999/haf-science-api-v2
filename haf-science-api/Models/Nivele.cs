@@ -12,8 +12,10 @@ namespace haf_science_api.Models
         public string Descripcion { get; set; }
         public string RecompensaNivel { get; set; }
         public int JuegoId { get; set; }
+        public int EstadoId { get; set; }
         public bool Eliminado { get; set; }
 
+        public virtual Estado Estado { get; set; }
         public virtual Juego Juego { get; set; }
     }
 }

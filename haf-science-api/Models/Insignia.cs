@@ -16,6 +16,7 @@ namespace haf_science_api.Models
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
         public int TipoInsigniaId { get; set; }
+        public int ImagenesInsignias { get; set; }
         public int EstadoId { get; set; }
         public int CreadoPor { get; set; }
         public DateTime FechaCreacion { get; set; }
@@ -23,6 +24,7 @@ namespace haf_science_api.Models
 
         public virtual Usuario CreadoPorNavigation { get; set; }
         public virtual Estado Estado { get; set; }
+        public virtual ImagenesInsignia ImagenesInsigniasNavigation { get; set; }
         public virtual TiposInsignia TipoInsignia { get; set; }
         public virtual ICollection<UsuariosInsignia> UsuariosInsignia { get; set; }
     }

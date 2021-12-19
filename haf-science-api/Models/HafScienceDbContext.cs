@@ -19,6 +19,7 @@ namespace haf_science_api.Models
         public virtual DbSet<Directore> Directores { get; set; }
         public virtual DbSet<Distrito> Distritos { get; set; }
         public virtual DbSet<Estado> Estados { get; set; }
+        public virtual DbSet<ImagenesInsignia> ImagenesInsignias { get; set; }
         public virtual DbSet<Insignia> Insignias { get; set; }
         public virtual DbSet<Juego> Juegos { get; set; }
         public virtual DbSet<Municipio> Municipios { get; set; }
@@ -43,6 +44,7 @@ namespace haf_science_api.Models
         public virtual DbSet<UsuariosInsignia> UsuariosInsignias { get; set; }
         public virtual DbSet<UsuariosLog> UsuariosLogs { get; set; }
         public virtual DbSet<UsuariosSesione> UsuariosSesiones { get; set; }
+        public virtual DbSet<UsuariosSesionesInsignia> UsuariosSesionesInsignias { get; set; }
         public virtual DbSet<UsuariosModel> UsuariosModel { get; set; }
         public virtual DbSet<UsuarioView> UsuariosView { get; set; }
         public virtual DbSet<PaginatedUsuariosView> PaginatedUsuariosView { get; set; }
@@ -155,7 +157,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Directore>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F3BFEC2E8D")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F34D0C76FD")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -181,7 +183,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Distrito>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCF64A6A74E")
+                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCF7B9DDEA0")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -215,8 +217,22 @@ namespace haf_science_api.Models
                     .HasConstraintName("FK_TiposEstados_Estados");
             });
 
+            modelBuilder.Entity<ImagenesInsignia>(entity =>
+            {
+                entity.Property(e => e.ContenidoSvg)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MimeType)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<Insignia>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.Property(e => e.Descripcion)
                     .IsRequired()
                     .HasMaxLength(250)
@@ -228,7 +244,7 @@ namespace haf_science_api.Models
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
-                    .HasMaxLength(25)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.CreadoPorNavigation)
@@ -243,6 +259,12 @@ namespace haf_science_api.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Estados_Insignias");
 
+                entity.HasOne(d => d.ImagenesInsigniasNavigation)
+                    .WithMany(p => p.Insignia)
+                    .HasForeignKey(d => d.ImagenesInsignias)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ImagenesInsignias_Insignias");
+
                 entity.HasOne(d => d.TipoInsignia)
                     .WithMany(p => p.Insignia)
                     .HasForeignKey(d => d.TipoInsigniaId)
@@ -252,8 +274,6 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Juego>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.Property(e => e.DescripcionJuego)
                     .IsRequired()
                     .HasMaxLength(250)
@@ -297,8 +317,6 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Nivele>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.Property(e => e.Descripcion)
                     .IsRequired()
                     .HasMaxLength(250)
@@ -313,6 +331,12 @@ namespace haf_science_api.Models
                     .IsRequired()
                     .HasMaxLength(250)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Estado)
+                    .WithMany(p => p.Niveles)
+                    .HasForeignKey(d => d.EstadoId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Estados_Niveles");
 
                 entity.HasOne(d => d.Juego)
                     .WithMany(p => p.Niveles)
@@ -458,7 +482,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Regionale>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCF39D004DC")
+                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCFA5D3B4C1")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -547,7 +571,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<TiposCentrosEducativo>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCF2EB7D917")
+                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFCF1CE68F")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -611,10 +635,10 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DACAE4935E6")
+                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC2016366C")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE04E7FB0E1")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE05C7249AC")
                     .IsUnique();
 
                 entity.Property(e => e.Codigo)
@@ -710,7 +734,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F3ED1BA45D")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F3F29E5854")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -820,6 +844,29 @@ namespace haf_science_api.Models
                     .HasForeignKey(d => d.UsuarioId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Usuarios_UsuariosSesiones");
+            });
+
+            modelBuilder.Entity<UsuariosSesionesInsignia>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.HasOne(d => d.Insignia)
+                    .WithMany()
+                    .HasForeignKey(d => d.InsigniaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Insignias_UsuariosSesionesInsignias");
+
+                entity.HasOne(d => d.Sesion)
+                    .WithMany()
+                    .HasForeignKey(d => d.SesionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Sesiones_UsuariosSesionesInsignias");
+
+                entity.HasOne(d => d.Usuario)
+                    .WithMany()
+                    .HasForeignKey(d => d.UsuarioId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Usuarios_UsuariosSesionesInsignias");
             });
 
             OnModelCreatingPartial(modelBuilder);

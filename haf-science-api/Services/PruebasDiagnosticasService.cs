@@ -212,7 +212,7 @@ namespace haf_science_api.Services
                 var usuarioRealizaPrueba = await _dbContext.UsuarioRealizaPruebas
                     .Where(realizaPrueba => realizaPrueba.SessionId == sessionId &&
                     realizaPrueba.PruebaDiagnosticaId == pruebaDiagnosticaId &&
-                    realizaPrueba.SessionId == sessionId && 
+                    realizaPrueba.UsuarioId == studentId && 
                     realizaPrueba.IntentoCompletado == true)
                     .CountAsync();
 
