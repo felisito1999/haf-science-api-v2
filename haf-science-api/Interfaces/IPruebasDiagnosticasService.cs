@@ -23,6 +23,6 @@ namespace haf_science_api.Interfaces
         Task<object> GetSessionAverageGrades(int sessionId, int teacherId);
         Task<object> GetSessionTestAverageGrades(int sessionId, int testId, int teacherId);
         Task<object> GetStudentSessionAverageGrades(int sessionId, int studentId, int teacherId);
-        Task<IEnumerable<object>> GetTestSessionGrades(int testId, int sessionId, int teacherId);
+        Task<object> GetTestSessionGrades(int testId, int sessionId, int teacherId);
     }
 }

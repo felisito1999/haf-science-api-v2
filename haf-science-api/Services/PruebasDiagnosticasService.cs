@@ -592,27 +592,27 @@ namespace haf_science_api.Services
             }
         }
 
-        public async Task<IEnumerable<object>> GetTestSessionGrades(int testId, int sessionId, int teacherId)
+        public async Task<object> GetTestSessionGrades(int testId, int sessionId, int teacherId)
         {
             try
             {
-                var grades = await _dbContext.UsuarioRealizaPruebas
-                .Select(realizaPrueba => new {
-                    realizaPrueba.PruebaDiagnosticaId,
-                    Usuario = new {realizaPrueba.Usuario.Id, realizaPrueba.Usuario.NombreUsuario, realizaPrueba.Usuario.UsuarioDetalle.Nombres, realizaPrueba.Usuario.UsuarioDetalle.Apellidos},
-                    realizaPrueba.SessionId,
-                    realizaPrueba.PruebaDiagnostica.CalificacionMaxima,
-                    realizaPrueba.Calificacion,
-                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
-                    realizaPrueba.IntentoCompletado,
-                    SesionCreadoPor = realizaPrueba.Session.CreadoPor
-                })
-                .Where(intento => intento.SessionId == sessionId && intento.IntentoCompletado == true && intento.PruebaDiagnosticaId == testId && intento.SesionCreadoPor == teacherId)
-                .ToListAsync();
+                var pruebaInfo = await _dbContext.PruebasDiagnosticas.Select(prueba => new {prueba.Id, prueba.Titulo, prueba.CalificacionMaxima})
+                    .Where(prueba => prueba.Id == testId).SingleOrDefaultAsync();
+
+                var grades = await _dbContext.UsuariosSesiones
+                    .Select(gradeRow => new { gradeRow.SesionId, 
+                        Usuario = new { gradeRow.Usuario.Id, gradeRow.Usuario.NombreUsuario, PersonalInfo = gradeRow.Usuario.UsuarioDetalle }, 
+                        RealizaPrueba  = gradeRow.Usuario.UsuarioRealizaPruebas.Where(attempt => attempt.PruebaDiagnosticaId == testId && attempt.SessionId == sessionId).SingleOrDefault(), gradeRow.Eliminado  })
+                    .Where(gradeRow => gradeRow.SesionId == sessionId && gradeRow.Eliminado == false) 
+                    .OrderByDescending(gradeRow => gradeRow.RealizaPrueba.IntentoCompletado)
+                    .ToListAsync();
 
                 if (grades.Any())
                 {
-                    return grades;
+                    return new {
+                        PruebaInfo = pruebaInfo,
+                        Grades = grades
+                    };
                 }
 
                 return null;
