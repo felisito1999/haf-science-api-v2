@@ -848,22 +848,22 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosSesionesInsignia>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new { e.UsuarioId, e.SesionId, e.InsigniaId });
 
                 entity.HasOne(d => d.Insignia)
-                    .WithMany()
+                    .WithMany(p => p.UsuariosSesionesInsignia)
                     .HasForeignKey(d => d.InsigniaId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Insignias_UsuariosSesionesInsignias");
 
                 entity.HasOne(d => d.Sesion)
-                    .WithMany()
+                    .WithMany(p => p.UsuariosSesionesInsignia)
                     .HasForeignKey(d => d.SesionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Sesiones_UsuariosSesionesInsignias");
 
                 entity.HasOne(d => d.Usuario)
-                    .WithMany()
+                    .WithMany(p => p.UsuariosSesionesInsignia)
                     .HasForeignKey(d => d.UsuarioId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Usuarios_UsuariosSesionesInsignias");

@@ -96,6 +96,7 @@ namespace haf_science_api
             services.AddScoped<IDataService<Role, RolView>, RolesService>();
             services.AddScoped<IPruebasDiagnosticasService<PruebasDiagnostica>, PruebasDiagnosticasService>();
             services.AddScoped<IPreguntasService<Pregunta>, PreguntasService>();
+            services.AddScoped<IInsigniasService<Insignia>, InsigniasService>();
 
             //services.AddScoped<IDataService<CentrosEducativo>, CentrosEducativosService>();
             //services.AddScoped<IDataService<Estado>, EstadosService>();

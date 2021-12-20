@@ -21,6 +21,7 @@ namespace haf_science_api.Models
             UsuariosInsigniaUsuarios = new HashSet<UsuariosInsignia>();
             UsuariosLogs = new HashSet<UsuariosLog>();
             UsuariosSesiones = new HashSet<UsuariosSesione>();
+            UsuariosSesionesInsignia = new HashSet<UsuariosSesionesInsignia>();
         }
 
         public int Id { get; set; }
@@ -53,5 +54,6 @@ namespace haf_science_api.Models
         public virtual ICollection<UsuariosInsignia> UsuariosInsigniaUsuarios { get; set; }
         public virtual ICollection<UsuariosLog> UsuariosLogs { get; set; }
         public virtual ICollection<UsuariosSesione> UsuariosSesiones { get; set; }
+        public virtual ICollection<UsuariosSesionesInsignia> UsuariosSesionesInsignia { get; set; }
     }
 }
