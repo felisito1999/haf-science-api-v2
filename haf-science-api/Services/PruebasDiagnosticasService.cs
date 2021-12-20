@@ -473,7 +473,7 @@ namespace haf_science_api.Services
             {
                 var grades = await _dbContext.UsuarioRealizaPruebas
                 .Select(realizaPrueba => new { realizaPrueba.SessionId, realizaPrueba.PruebaDiagnostica.CalificacionMaxima, realizaPrueba.Calificacion,
-                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? ( realizaPrueba.Calificacion / realizaPrueba.PruebaDiagnostica.CalificacionMaxima ) * 100 : 0 : 0,
                     realizaPrueba.IntentoCompletado, 
                     SesionCreadoPor = realizaPrueba.Session.CreadoPor })
                 .Where(intento => intento.SessionId == sessionId && intento.IntentoCompletado == true && intento.SesionCreadoPor == teacherId)
@@ -515,7 +515,7 @@ namespace haf_science_api.Services
                     realizaPrueba.SessionId,
                     realizaPrueba.PruebaDiagnostica.CalificacionMaxima,
                     realizaPrueba.Calificacion,
-                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.Calificacion / realizaPrueba.PruebaDiagnostica.CalificacionMaxima) * 100 : 0 : 0,
                     realizaPrueba.IntentoCompletado,
                     SesionCreadoPor = realizaPrueba.Session.CreadoPor
                 })
@@ -559,7 +559,7 @@ namespace haf_science_api.Services
                     realizaPrueba.SessionId,
                     realizaPrueba.PruebaDiagnostica.CalificacionMaxima,
                     realizaPrueba.Calificacion,
-                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.PruebaDiagnostica.CalificacionMaxima / realizaPrueba.Calificacion) * 100 : 0 : 0,
+                    Porcentaje = realizaPrueba.IntentoCompletado == true ? realizaPrueba.Calificacion > 0 ? (realizaPrueba.Calificacion / realizaPrueba.PruebaDiagnostica.CalificacionMaxima ) * 100 : 0 : 0,
                     realizaPrueba.IntentoCompletado,
                     SesionCreadoPor = realizaPrueba.Session.CreadoPor
                 })
