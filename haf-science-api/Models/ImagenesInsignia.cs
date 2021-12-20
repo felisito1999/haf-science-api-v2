@@ -13,7 +13,7 @@ namespace haf_science_api.Models
         }
 
         public int Id { get; set; }
-        public string ContenidoSvg { get; set; }
+        public string ImgData { get; set; }
         public string MimeType { get; set; }
         public bool Eliminado { get; set; }
 

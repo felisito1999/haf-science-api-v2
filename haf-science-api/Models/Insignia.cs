@@ -9,7 +9,6 @@ namespace haf_science_api.Models
     {
         public Insignia()
         {
-            UsuariosInsignia = new HashSet<UsuariosInsignia>();
             UsuariosSesionesInsignia = new HashSet<UsuariosSesionesInsignia>();
         }
 
@@ -27,7 +26,6 @@ namespace haf_science_api.Models
         public virtual Estado Estado { get; set; }
         public virtual ImagenesInsignia ImagenesInsigniasNavigation { get; set; }
         public virtual TiposInsignia TipoInsignia { get; set; }
-        public virtual ICollection<UsuariosInsignia> UsuariosInsignia { get; set; }
         public virtual ICollection<UsuariosSesionesInsignia> UsuariosSesionesInsignia { get; set; }
     }
 }

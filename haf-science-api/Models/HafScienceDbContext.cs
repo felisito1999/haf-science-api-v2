@@ -41,7 +41,6 @@ namespace haf_science_api.Models
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<UsuarioRealizaPrueba> UsuarioRealizaPruebas { get; set; }
         public virtual DbSet<UsuariosDetalle> UsuariosDetalles { get; set; }
-        public virtual DbSet<UsuariosInsignia> UsuariosInsignias { get; set; }
         public virtual DbSet<UsuariosLog> UsuariosLogs { get; set; }
         public virtual DbSet<UsuariosSesione> UsuariosSesiones { get; set; }
         public virtual DbSet<UsuariosSesionesInsignia> UsuariosSesionesInsignias { get; set; }
@@ -157,7 +156,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Directore>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F34D0C76FD")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Director__531402F352E8E6C9")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -183,7 +182,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Distrito>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCF7B9DDEA0")
+                entity.HasIndex(e => e.Nombre, "UQ__Distrito__75E3EFCF3A96C1E0")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -195,7 +194,7 @@ namespace haf_science_api.Models
                     .WithMany(p => p.Distritos)
                     .HasForeignKey(d => d.RegionalId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Distritos__Regio__3E52440B");
+                    .HasConstraintName("FK__Distritos__Regio__36470DEF");
             });
 
             modelBuilder.Entity<Estado>(entity =>
@@ -219,7 +218,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<ImagenesInsignia>(entity =>
             {
-                entity.Property(e => e.ContenidoSvg)
+                entity.Property(e => e.ImgData)
                     .IsRequired()
                     .IsUnicode(false);
 
@@ -231,8 +230,6 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Insignia>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.Property(e => e.Descripcion)
                     .IsRequired()
                     .HasMaxLength(250)
@@ -482,7 +479,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Regionale>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCFA5D3B4C1")
+                entity.HasIndex(e => e.Nombre, "UQ__Regional__75E3EFCFBF5A177F")
                     .IsUnique();
 
                 entity.Property(e => e.Nombre)
@@ -571,7 +568,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<TiposCentrosEducativo>(entity =>
             {
-                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCFCF1CE68F")
+                entity.HasIndex(e => e.Nombre, "UQ__TiposCen__75E3EFCF6B202F9F")
                     .IsUnique();
 
                 entity.Property(e => e.Descripcion)
@@ -635,10 +632,10 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC2016366C")
+                entity.HasIndex(e => e.Codigo, "UQ__Usuarios__06370DAC1D3C1B2C")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE05C7249AC")
+                entity.HasIndex(e => e.NombreUsuario, "UQ__Usuarios__6B0F5AE0D557DE37")
                     .IsUnique();
 
                 entity.Property(e => e.Codigo)
@@ -734,7 +731,7 @@ namespace haf_science_api.Models
 
             modelBuilder.Entity<UsuariosDetalle>(entity =>
             {
-                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F3F29E5854")
+                entity.HasIndex(e => e.CorreoElectronico, "UQ__Usuarios__531402F3CDF8A553")
                     .IsUnique();
 
                 entity.Property(e => e.Apellidos)
@@ -761,43 +758,6 @@ namespace haf_science_api.Models
                     .WithMany(p => p.UsuariosDetalles)
                     .HasForeignKey(d => d.CentroEducativoId)
                     .HasConstraintName("FK_CentrosEducativos_Usuarios");
-            });
-
-            modelBuilder.Entity<UsuariosInsignia>(entity =>
-            {
-                entity.HasKey(e => new { e.UsuarioId, e.InsigniaId });
-
-                entity.Property(e => e.FechaCreacion)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getutcdate())");
-
-                entity.Property(e => e.NombreInsignia)
-                    .IsRequired()
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.NombreUsuario)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.AsignadoPorNavigation)
-                    .WithMany(p => p.UsuariosInsigniaAsignadoPorNavigations)
-                    .HasForeignKey(d => d.AsignadoPor)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UsuariosAsgina_UsuariosInsignias");
-
-                entity.HasOne(d => d.Insignia)
-                    .WithMany(p => p.UsuariosInsignia)
-                    .HasForeignKey(d => d.InsigniaId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Insignias_UsuariosInsignias");
-
-                entity.HasOne(d => d.Usuario)
-                    .WithMany(p => p.UsuariosInsigniaUsuarios)
-                    .HasForeignKey(d => d.UsuarioId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Usuarios_UsuariosInsignias");
             });
 
             modelBuilder.Entity<UsuariosLog>(entity =>

@@ -80,7 +80,7 @@ namespace haf_science_api.Services
             try
             {
                 var insignias = await _dbContext.Insignias
-                    .Select(insignia => new { insignia.Id, insignia.Nombre, insignia.Descripcion, Imagen = insignia.ImagenesInsigniasNavigation.ContenidoSvg, insignia.CreadoPor, insignia.Eliminado })
+                    .Select(insignia => new { insignia.Id, insignia.Nombre, insignia.Descripcion, Imagen = insignia.ImagenesInsigniasNavigation.ImgData, insignia.CreadoPor, insignia.Eliminado })
                     .Where(insignia => insignia.CreadoPor == teacherId && insignia.Eliminado == false)
                     .ToListAsync();
 
@@ -98,7 +98,7 @@ namespace haf_science_api.Services
             try
             {
                 var insignias = await _dbContext.UsuariosSesionesInsignias
-                    .Select(insignia => new { insignia.SesionId, insignia.UsuarioId, Insignia = new { insignia.Insignia.Nombre, insignia.Insignia.Descripcion, insignia.Insignia.ImagenesInsigniasNavigation.ContenidoSvg } })
+                    .Select(insignia => new { insignia.SesionId, insignia.UsuarioId, Insignia = new { insignia.Insignia.Nombre, insignia.Insignia.Descripcion, insignia.Insignia.ImagenesInsigniasNavigation.ImgData } })
                     .Where(insignia => insignia.SesionId == sessionId && insignia.UsuarioId == studentId)
                     .ToListAsync();
 
@@ -115,7 +115,7 @@ namespace haf_science_api.Services
         {
             try
             {
-                var insignia = await  _dbContext.UsuariosSesionesInsignias.Select(insignia => new { insignia.InsigniaId, insignia.SesionId, insignia.UsuarioId, Imagen = insignia.Insignia.ImagenesInsigniasNavigation.ContenidoSvg })
+                var insignia = await  _dbContext.UsuariosSesionesInsignias.Select(insignia => new { insignia.InsigniaId, insignia.SesionId, insignia.UsuarioId, Imagen = insignia.Insignia.ImagenesInsigniasNavigation.ImgData })
                     .Where(insignia => insignia.UsuarioId == studentId && insignia.SesionId == sessionId)
                     .FirstOrDefaultAsync();
 
